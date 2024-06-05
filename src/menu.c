@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#define OPTION_COUNT 3
+
 int main()
 {
     setlocale(LC_ALL, "");
@@ -61,12 +63,12 @@ int main()
             {
                 op--;
                 if (op < 1)
-                    op = 3;
+                    op = OPTION_COUNT;
             }
             else if (c == 80)
             {
                 op++;
-                if (op > 3)
+                if (op > OPTION_COUNT)
                     op = 1;
             }
         }
