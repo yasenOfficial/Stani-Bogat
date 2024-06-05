@@ -34,6 +34,8 @@ int main()
             if(op == 1){
                 printf("Zapochna igra\n");
                 break; // Ralchev da pishe kod
+                // Select random question
+                // press j for menu with jokers
             }else if(op == 2) {
                 printf("----------------------------------------------------------------------------------------------\n");
                 printf("1. Imate 10 vyprosa s narastvashta trudnost.\n");
