@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#define OPTION_COUNT 3
+#define OPTION_COUNT 5
 
 int main()
 {
@@ -21,7 +21,9 @@ int main()
 
         if (op == 1)printf(">1. Zapochni igra\n");else printf(" 1. Zapochni igra\n");
         if (op == 2)printf(">2. Pravila na igrata\n");else printf(" 2. Pravila na igrata\n");
-        if (op == 3)printf(">3. Izhod\n");else printf(" 3. Izhod\n");
+        if (op == 3)printf(">3. Dobavqne na now vupros\n");else printf(" 3. Dobavqne na now vupros\n");
+        if (op == 4)printf(">4. Redaktirane na vupros\n");else printf(" 4. Redaktirane na vupros\n");
+        if (op == 5)printf(">5. Izhod\n");else printf(" 5. Izhod\n");
 
         c = getch();
 
@@ -34,8 +36,10 @@ int main()
         if (c == 13) // Enter
         {
             if(op == 1){
-                printf("Zapochna igra\n");
-                break; // Ralchev da pishe kod
+                printf("Igrata zapochna!\n");
+                printf("Natisni kojto i da e klavish za da produljish...\n\n");
+
+                getch();  // Ralchev da pishe kod
                 // Select random question
                 // press j for menu with jokers
             }else if(op == 2) {
@@ -51,6 +55,14 @@ int main()
                 getch(); 
 
             }else if(op == 3) {
+                printf("Dobavqne na vupros\n");
+                break;
+
+            }else if(op == 4) {
+                printf("Redaktirane na vupros\n");
+                break;
+
+            }else if(op == 5) {
                 printf("Izhod\n");
                 break;
             }
