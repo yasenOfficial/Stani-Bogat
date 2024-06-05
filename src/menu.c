@@ -4,10 +4,31 @@
 #include <locale.h>
 
 #define OPTION_COUNT 5
+#define QUESTION_COUNT 10
 
+void option(unsigned char c, int *otg){
+    if (c == 224 || c == 0) {
+        c = getch();
+        if (c == 72) { // Стрелка нагоре
+            (*otg)--;
+            if (*otg < 1)
+                *otg = OPTION_COUNT;
+        } else if (c == 80) { // Стрелка надолу
+            (*otg)++;
+            if (*otg > OPTION_COUNT)
+                *otg = 1;
+        }
+    }
+}
+
+//Jokeri
+void joker5050();
+void jokerObadise();
+void jokerPublika();
 int main()
 {
     setlocale(LC_ALL, "");
+    int joker5050 = 0, jokerObadise = 0, jokerPublika = 0;
     
     unsigned char c;
     int op = 1;
@@ -42,6 +63,35 @@ int main()
                 getch();  // Ralchev da pishe kod
                 // Select random question
                 // press j for menu with jokers
+                int otg = 1;
+                do{
+                    int i = 0;
+                    system("cls");
+                    printf("Vupros %d:\n", i + 1);
+
+                    if (otg == 1)printf(">1. Otgovor A\n");else printf(" 1. Otgovor A\n");
+                    if (otg == 2)printf(">2. Otgovor B\n");else printf(" 2. Otgovor B\n");
+                    if (otg == 3)printf(">3. Otgovor C\n");else printf(" 3. Otgovor C\n");
+                    if (otg == 4)printf(">4. Otgovor D\n");else printf(" 4. Otgovor D\n");
+                    if (otg == 5)printf(">5. Jokeri\n");else printf(" 5. Jokeri\n");
+
+                    c = getch();
+
+                    option(c, &otg);
+
+                    if (c == 3) {
+                        printf("\nProgramata e spryana s Ctrl + C\n");
+                        return 0;
+                    }
+
+                    if(otg == 1) printf("Izbra otgovor A\n");
+                    else if(otg == 2) printf("Izbra otgovor B\n");
+                    else if(otg == 3) printf("Izbra otgovor C\n");
+                    else if(otg == 4) printf("Izbra otgovor D\n");
+                    else if(otg == 5) printf("Izbra joker:");
+
+                }while (c != 27);
+                
             }else if(op == 2) {
                 printf("----------------------------------------------------------------------------------------------\n");
                 printf("1. Imate 10 vyprosa s narastvashta trudnost.\n");
@@ -68,22 +118,7 @@ int main()
             }
         }
 
-        if (c == 224 || c == 0)
-        {
-            c = getch();
-            if (c == 72)
-            {
-                op--;
-                if (op < 1)
-                    op = OPTION_COUNT;
-            }
-            else if (c == 80)
-            {
-                op++;
-                if (op > OPTION_COUNT)
-                    op = 1;
-            }
-        }
+    option(c, &op);
 
     } while (c != 27);
 
