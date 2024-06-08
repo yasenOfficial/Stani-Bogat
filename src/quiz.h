@@ -7,6 +7,7 @@ typedef struct quiz_question {
     char *question_text;
     char *options[4];
     int correct_option_index;
+    int difficulty;
     struct quiz_question *next;
 } QuizQuestion;
 
@@ -25,8 +26,11 @@ BST и Graph също биха били добри опции, но не бих�
 */
 
 void initialize_quiz();
-void add_question(char *text, int difficulty, char **options, int correct_index);
-QuizQuestion *get_random_question(int difficulty);
+void add_question_to_file(const char *filename, char *text, int difficulty, char **options, int correct_index);
+void edit_question_in_file(const char *filename, int question_number);
+void save_questions_to_file(const char *filename);
+void load_questions_from_file(const char *filename);
 void cleanup_quiz();
+void print_questions();
 
 #endif
