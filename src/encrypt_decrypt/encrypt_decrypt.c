@@ -62,9 +62,13 @@ void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size
         if (i % KEY_SIZE == 0) { 
             encryptState = lcg(&encryptState);
         }
-        output[i] = input[i] ^ ((encryptState >> (8 * (i % 4))) & 0xFF);  // Use parts of the PRNG state as the XOR key
+        output[i] = input[i] ^ ((encryptState >> (8 * (i % 4))) & 0xFF);  
+        
         // Този ред изпълнява операцията XOR. encryptState състоянието се измества надясно с кратно на 8 бита (контролирано от i % 4) 
         // Това помага за по-равномерното разпространение на влиянието на PRNG състоянието в данните.
+
+        // & 0xFF: Това е побитова операция И с 0xFF, което е еквивалентно на 11111111 в двоичен код. 
+        // Тази операция гарантира, че се запазва само най-малко значимият байт (8 бита) от изместената стойност.
     }
 }
 
