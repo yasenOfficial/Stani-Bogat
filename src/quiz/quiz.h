@@ -35,8 +35,6 @@ void edit_question_in_file(const char *filename, int question_number);
 void save_questions_to_file(const char *filename);
 void load_questions_from_file(const char *filename);
 void cleanup_quiz();
-void print_questions();
-
-
+void print_questions(const char *filename, bool print_answers, bool print_difficulty);
 
 #endif
