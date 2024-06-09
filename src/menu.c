@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <conio.h>
-#include <stdlib.h>
-#include <locale.h>
-
-#define OPTION_COUNT 5
-#define QUESTION_COUNT 10
+#include "menu.h"
 
 void option(unsigned char c, int *otg){
     if (c == 224 || c == 0) {
