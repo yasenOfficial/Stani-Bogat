@@ -234,7 +234,7 @@ int main() {
 
     // Извеждане на заредените въпроси
     printf("\nZaredeni Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+    print_questions("quiz_questions_updated.txt", true, true);
 
     // Почистване на системата за викторина
     cleanup_quiz();
