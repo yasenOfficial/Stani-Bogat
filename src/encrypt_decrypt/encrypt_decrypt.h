@@ -1,13 +1,18 @@
 #ifndef ENCRYPT_DECRYPT_H
 #define ENCRYPT_DECRYPT_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+    #include <stdint.h>
 
-#define KEY_SIZE 16
+    #define KEY_SIZE 16 
 
-void encrypt(const char *input_filename, const char *output_filename, const unsigned char *key);
-void decrypt(const char *input_filename, const char *output_filename, const unsigned char *key);
+    const uint32_t A_LCG = 1664525;
+    const uint32_t C_LCG = 1013904223;
+    const uint32_t M = 0xFFFFFFFF; // 2^32 
 
-#endif // ENCRYPT_DECRYPT_H
+    uint32_t init_state(const unsigned char *key, size_t key_size);
+    uint32_t lcg(uint32_t *state);
+    uint32_t mcg(uint32_t *state);
+
+    void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size_t length, const unsigned char *key);
+
+#endif 
