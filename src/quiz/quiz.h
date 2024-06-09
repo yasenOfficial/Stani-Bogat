@@ -5,6 +5,7 @@
 #define MAX_QUESTIONS 1000
 
 #include <time.h>
+#include <stdbool.h>
 
 typedef struct quiz_question {
     char *question_text;

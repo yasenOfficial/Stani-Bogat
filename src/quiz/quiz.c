@@ -171,16 +171,73 @@ void load_questions_from_file(const char *filename) {
     fclose(file);
 }
 
-void print_questions() {
-    QuizQuestion *current = head;
-    int index = 1;
-    while (current) {
-        printf("Vupros %d: %s\n", index++, current->question_text);
-        for (int i = 0; i < 4; i++) {
-            printf("  Otgovor %d: %s\n", i + 1, current->options[i]);
-        }
-        printf("  Veren otgovor: %d\n", current->correct_option_index + 1);
-        printf("  Trudnost: %d\n\n", current->difficulty);
-        current = current->next;
+// Ne sum siguren dali ni trqbwat gornite dve funkcii ^^^
+
+void print_questions(const char *filename, bool print_answers, bool print_difficulty) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Ne moge da se otvori fail za chetene");
+        return;
     }
+
+    char buffer[256];
+    int index = 1;
+    while (fgets(buffer, sizeof(buffer), file)) {
+        printf("Vupros %d: %s", index++, buffer);
+        for (int i = 0; i < 4; i++) {
+            fgets(buffer, sizeof(buffer), file);
+            printf("  Otgovor %d: %s", i + 1, buffer);
+        }
+        fgets(buffer, sizeof(buffer), file);
+        int correct_option;
+        sscanf(buffer, "%d", &correct_option);
+        printf("  Veren otgovor: %d\n", correct_option);
+        
+        fgets(buffer, sizeof(buffer), file);
+        int difficulty;
+        sscanf(buffer, "%d", &difficulty);
+        printf("  Trudnost: %d\n\n", difficulty);
+    }
+
+    fclose(file);
+}
+
+
+
+int main() {
+    // Инициализиране на системата за викторина
+    initialize_quiz();
+
+    // Добавяне на някои въпроси към викторината
+    char *options1[] = {"Optsiya 1", "Optsiya 2", "Optsiya 3", "Optsiya 4"};
+    add_question_to_file("quiz_questions.txt", "Vupros 1", 5, options1, 2);
+
+    char *options2[] = {"Optsiya A", "Optsiya B", "Optsiya C", "Optsiya D"};
+    add_question_to_file("quiz_questions.txt", "Vupros 2", 7, options2, 1);
+
+    // Извеждане на всички въпроси във викторината
+    printf("Nachalni Vuprosi:\n");
+    print_questions("quiz_questions.txt", true, true);
+
+    // Редактиране на въпрос във викторината
+    edit_question_in_file("quiz_questions.txt", 1);
+
+    // Извеждане на актуализираните въпроси във викторината
+    printf("\nAktualizirani Vuprosi:\n");
+    print_questions("quiz_questions.txt", true, true);
+
+    // Запазване на актуализираните въпроси във файл
+    save_questions_to_file("quiz_questions_updated.txt");
+
+    // Зареждане на въпросите от актуализирания файл
+    load_questions_from_file("quiz_questions_updated.txt");
+
+    // Извеждане на заредените въпроси
+    printf("\nZaredeni Vuprosi:\n");
+    print_questions("quiz_questions.txt", true, true);
+
+    // Почистване на системата за викторина
+    cleanup_quiz();
+
+    return 0;
 }
