@@ -2,6 +2,9 @@
 #define QUIZ_H
 
 #define MAX_DIFFICULTY 10 
+#define MAX_QUESTIONS 1000
+
+#include <time.h>
 
 typedef struct quiz_question {
     char *question_text;
@@ -32,5 +35,7 @@ void save_questions_to_file(const char *filename);
 void load_questions_from_file(const char *filename);
 void cleanup_quiz();
 void print_questions();
+
+
 
 #endif

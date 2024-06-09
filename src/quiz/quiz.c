@@ -1,9 +1,6 @@
 #include "quiz.h"
 #include <stdlib.h>
-#include <time.h>
 #include <stdio.h>
-
-#define MAX_QUESTIONS 1000
 
 static QuizQuestion *head = NULL;
 
@@ -14,7 +11,7 @@ void initialize_quiz() {
 void add_question_to_file(const char *filename, char *text, int difficulty, char **options, int correct_index) {
     FILE *file = fopen(filename, "a");
     if (!file) {
-        perror("Не може да се отвори файл за запис");
+        perror("Ne moge da se otvori fail za zapis");
         return;
     }
 
@@ -31,13 +28,13 @@ void add_question_to_file(const char *filename, char *text, int difficulty, char
 void edit_question_in_file(const char *filename, int question_number) {
     FILE *file = fopen(filename, "r");
     if (!file) {
-        perror("Не може да се отвори файл за четене");
+        perror("Ne moge da se otvori fail za chetene");
         return;
     }
 
     FILE *temp_file = fopen("temp.txt", "w");
     if (!temp_file) {
-        perror("Не може да се отвори временен файл за запис");
+        perror("Ne moge da se otvori vremenen fail za zapis");
         fclose(file);
         return;
     }
@@ -54,21 +51,21 @@ void edit_question_in_file(const char *filename, int question_number) {
             int new_correct_index;
             int new_difficulty;
 
-            printf("Въведете нов текст на въпроса: ");
+            printf("Vuvedete nov text za vuprosa: ");
             fgets(new_text, sizeof(new_text), stdin);
             new_text[strcspn(new_text, "\n")] = '\0';  // Премахване на новия ред
 
             for (int i = 0; i < 4; i++) {
-                printf("Въведете нов отговор %d: ", i + 1);
+                printf("Vuvedete nov otgovor %d: ", i + 1);
                 fgets(new_options[i], sizeof(new_options[i]), stdin);
                 new_options[i][strcspn(new_options[i], "\n")] = '\0';  // Премахване на новия ред
             }
 
-            printf("Въведете нов номер на верния отговор (1-4): ");
+            printf("Vuvedete nomer na pravilniq otgovor (1-4): ");
             scanf("%d", &new_correct_index);
             new_correct_index--;  // Правим индекса 0-базиран
 
-            printf("Въведете ново ниво на трудност (1-10): ");
+            printf("Vuvedete nivo na trudnost (1-10): ");
             scanf("%d", &new_difficulty);
             getchar();  // Премахване на новия ред
 
@@ -119,7 +116,7 @@ void cleanup_quiz() {
 void save_questions_to_file(const char *filename) {
     FILE *file = fopen(filename, "w");
     if (!file) {
-        perror("Не може да се отвори файл за запис");
+        perror("Ne moge da se otvori fail za zapis");
         return;
     }
 
@@ -140,7 +137,7 @@ void save_questions_to_file(const char *filename) {
 void load_questions_from_file(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
-        perror("Не може да се отвори файл за четене");
+        perror("Ne moge da se otvori fail za chetene");
         return;
     }
 
@@ -150,7 +147,7 @@ void load_questions_from_file(const char *filename) {
     while (fgets(buffer, sizeof(buffer), file)) {
         QuizQuestion *new_question = (QuizQuestion*)malloc(sizeof(QuizQuestion));
         if (!new_question) {
-            perror("Не може да се задели памет за въпрос");
+            perror("Ne moje da se zaredi vuprosa v pametta");
             fclose(file);
             return;
         }
@@ -178,12 +175,12 @@ void print_questions() {
     QuizQuestion *current = head;
     int index = 1;
     while (current) {
-        printf("Въпрос %d: %s\n", index++, current->question_text);
+        printf("Vupros %d: %s\n", index++, current->question_text);
         for (int i = 0; i < 4; i++) {
-            printf("  Отговор %d: %s\n", i + 1, current->options[i]);
+            printf("  Otgovor %d: %s\n", i + 1, current->options[i]);
         }
-        printf("  Верен отговор: %d\n", current->correct_option_index + 1);
-        printf("  Трудност: %d\n\n", current->difficulty);
+        printf("  Veren otgovor: %d\n", current->correct_option_index + 1);
+        printf("  Trudnost: %d\n\n", current->difficulty);
         current = current->next;
     }
 }
