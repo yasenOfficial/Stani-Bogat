@@ -29,12 +29,12 @@ int main() {
     printf("\nAktualizirani Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
 
-    save_questions_to_file("quiz_questions_updated.txt");
+    // save_questions_to_file("quiz_questions_updated.txt");
 
-    load_questions_from_file("quiz_questions_updated.txt");
+    // load_questions_from_file("quiz_questions_updated.txt");
 
-    printf("\nZaredeni Vuprosi:\n");
-    print_questions("quiz_questions_updated.txt", true, true);
+    // printf("\nZaredeni Vuprosi:\n");
+    // print_questions("quiz_questions_updated.txt", true, true);
 
     cleanup_quiz();
 

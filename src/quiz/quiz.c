@@ -20,8 +20,7 @@ bool debug = true;
 
 static QuizQuestion *head = NULL;
 
-// extern encryption_key;
-unsigned char encryption_key[KEY_SIZE] = "This is a key";
+extern encryption_key;
 
 void write_encrypted(FILE *file, const char *data)
 {
@@ -128,6 +127,7 @@ QuizQuestion *find_question_by_index(int index)
     return current_index == index ? current : NULL;
 }
 
+// i dont think this works either
 void edit_question_in_file(const char *filename, int question_number)
 {
     FILE *file = fopen(filename, "r");
@@ -367,7 +367,8 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
         }
         else
         {
-            read_and_decrypt(file, buffer, sizeof(buffer));
+            // read_and_decrypt(file, buffer, sizeof(buffer));
+            xor_encrypt_decrypt((const unsigned char *)buffer, (unsigned char *)buffer, sizeof(buffer), encryption_key);
             printf("\n\nVupros %d: %s\n", index++, buffer);
         }
 
@@ -420,41 +421,41 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
     fclose(file);
 }
 
-int main()
-{
-    // Initialize the quiz system
-    initialize_quiz();
+// int main()
+// {
+//     // Initialize the quiz system
+//     initialize_quiz();
 
-    // Add some questions to the quiz
-    char *options1[] = {"35", "36", "37", "38"};
-    add_question_to_file("quiz_questions.txt", "How old is andrew tate", 5, options1, 3);
+//     // Add some questions to the quiz
+//     char *options1[] = {"35", "36", "37", "38"};
+//     add_question_to_file("quiz_questions.txt", "How old is andrew tate", 5, options1, 3);
 
-    char *options2[] = {"A", "B", "C", "D"};
-    add_question_to_file("quiz_questions.txt", "Tup vupros", 10, options2, 1);
+//     char *options2[] = {"A", "B", "C", "D"};
+//     add_question_to_file("quiz_questions.txt", "Tup vupros", 10, options2, 1);
 
-    // Print all questions in the quiz
-    printf("Nachalni Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+//     // Print all questions in the quiz
+//     printf("Nachalni Vuprosi:\n");
+//     print_questions("quiz_questions.txt", true, true);
 
-    // Edit a question in the quiz
-    edit_question_in_file("quiz_questions.txt", 1);
+//     // Edit a question in the quiz
+//     edit_question_in_file("quiz_questions.txt", 1);
 
-    // Print the updated questions in the quiz
-    printf("\nAktualizirani Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+//     // Print the updated questions in the quiz
+//     printf("\nAktualizirani Vuprosi:\n");
+//     print_questions("quiz_questions.txt", true, true);
 
-    // Save the updated questions to a file
-    // save_questions_to_file("quiz_questions_updated.txt");
+//     // Save the updated questions to a file
+//     // save_questions_to_file("quiz_questions_updated.txt");
 
-    // // Load the questions from the updated file
-    // load_questions_from_file("quiz_questions_updated.txt");
+//     // // Load the questions from the updated file
+//     // load_questions_from_file("quiz_questions_updated.txt");
 
-    // // Print the loaded questions
-    // printf("\nZaredeni Vuprosi:\n");
-    // print_questions("quiz_questions_updated.txt", true, true);
+//     // // Print the loaded questions
+//     // printf("\nZaredeni Vuprosi:\n");
+//     // print_questions("quiz_questions_updated.txt", true, true);
 
-    // Cleanup the quiz system
-    cleanup_quiz();
+//     // Cleanup the quiz system
+//     cleanup_quiz();
 
-    return 0;
-}
+//     return 0;
+// }
