@@ -2,12 +2,13 @@
 #define ENCRYPT_DECRYPT_H
 
 #include <stdint.h>
+#include <stddef.h> 
 
 #define KEY_SIZE 16 
 
-const uint32_t A_LCG = 1664525;
-const uint32_t C_LCG = 1013904223;
-const uint32_t M = 0xFFFFFFFF; // 2^32 
+extern const uint32_t A_LCG;
+extern const uint32_t C_LCG;
+extern const uint32_t M;
 
 uint32_t init_state(const unsigned char *key, size_t key_size);
 uint32_t lcg(uint32_t *state);

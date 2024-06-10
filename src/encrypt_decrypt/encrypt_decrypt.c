@@ -1,9 +1,13 @@
 #include "encrypt_decrypt.h"
 
+const uint32_t A_LCG = 1664525;
+const uint32_t C_LCG = 1013904223;
+const uint32_t M = 0xFFFFFFFF; // 2^32
+
 // X_0 се инициализира с ключа на шифъра.
 uint32_t init_state(const unsigned char *key, size_t key_size) {
     uint32_t state = 0;
-    for (int i = 0; i < key_size; ++i) {
+    for (size_t i = 0; i < key_size; ++i) {
         state = (state * 31 + key[i]) % M;
     }
     return state;
@@ -42,7 +46,7 @@ uint32_t mcg(uint32_t *state) {
     // Следващото число се генерира, като се умножи текущото с A, се добави константата C и се вземе остатъкът при деление на M.
 }
 
-void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size_t length, const unsigned char *key) {
+extern void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size_t length, const unsigned char *key) {
     uint32_t encryptState = 0;
 
     for (int i = 0; i < KEY_SIZE; i++) {

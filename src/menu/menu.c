@@ -19,7 +19,7 @@ void option(unsigned char c, int *otg){
 void joker5050();
 void jokerObadise();
 void jokerPublika();
-int main()
+int menu()
 {
     setlocale(LC_ALL, "");
     int joker5050 = 0, jokerObadise = 0, jokerPublika = 0;
