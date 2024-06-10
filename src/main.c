@@ -10,10 +10,7 @@
 #include "menu/menu.h"
 #include "quiz/quiz.h"
 
-
-const unsigned char *encryption_key = "YourEncryptionKey";
-const size_t encryption_key_size = sizeof("YourEncryptionKey") - 1; // Subtract 1 to not count the null terminator
-
+unsigned char encryption_key[KEY_SIZE] = "This is a key";
 
 int main() {
     initialize_quiz();
