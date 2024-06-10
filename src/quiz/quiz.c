@@ -41,6 +41,18 @@ void add_question_to_file(const char *filename, char *text, int difficulty, char
     fclose(file);
 }
 
+QuizQuestion* find_question_by_index(int index) {
+    QuizQuestion *current = head;
+    int current_index = 1;
+
+    while (current && current_index < index) {
+        current = current->next;
+        current_index++;
+    }
+
+    return current_index == index ? current : NULL;
+}
+
 void edit_question_in_file(const char *filename, int question_number) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -58,6 +70,14 @@ void edit_question_in_file(const char *filename, int question_number) {
     char buffer[256];
     int current_question = 1;
     int line_count = 0;
+
+    QuizQuestion *question_to_edit = find_question_by_index(question_number);
+    if (!question_to_edit) {
+        printf("Nqma vupros s takuv nomer\n");
+        fclose(file);
+        fclose(temp_file);
+        return;
+    }
 
     while (fgets(buffer, sizeof(buffer), file)) {
         if (line_count == 0 && current_question == question_number) {
@@ -84,6 +104,19 @@ void edit_question_in_file(const char *filename, int question_number) {
             scanf("%d", &new_difficulty);
             getchar();
 
+            // Update the dynamic memory
+            free(question_to_edit->question_text);
+            question_to_edit->question_text = strdup(new_text);
+
+            for (int i = 0; i < 4; i++) {
+                free(question_to_edit->options[i]);
+                question_to_edit->options[i] = strdup(new_options[i]);
+            }
+
+            question_to_edit->correct_option_index = new_correct_index;
+            question_to_edit->difficulty = new_difficulty;
+
+            // Write to temporary file
             fprintf(temp_file, "%s\n", new_text);
             for (int i = 0; i < 4; i++) {
                 fprintf(temp_file, "%s\n", new_options[i]);
