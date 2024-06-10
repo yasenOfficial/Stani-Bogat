@@ -182,7 +182,6 @@ void save_questions_to_file(const char *filename) {
     fclose(file);
 }
 
-
 void load_questions_from_file(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -253,40 +252,31 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
     fclose(file);
 }
 
-int main() {
-    // Initialize the quiz system
-    initialize_quiz();
+// int main() {
+//     initialize_quiz();
 
-    // Add some questions to the quiz
-    char *options1[] = {"Optsiya 1", "Optsiya 2", "Optsiya 3", "Optsiya 4"};
-    add_question_to_file("quiz_questions.txt", "Vupros 1", 5, options1, 2);
+//     char *options1[] = {"Optsiya 1", "Optsiya 2", "Optsiya 3", "Optsiya 4"};
+//     add_question_to_file("quiz_questions.txt", "Vupros 1", 5, options1, 2);
 
-    char *options2[] = {"Optsiya A", "Optsiya B", "Optsiya C", "Optsiya D"};
-    add_question_to_file("quiz_questions.txt", "Vupros 2", 7, options2, 1);
+//     char *options2[] = {"Optsiya A", "Optsiya B", "Optsiya C", "Optsiya D"};
+//     add_question_to_file("quiz_questions.txt", "Vupros 2", 7, options2, 1);
 
-    // Print all questions in the quiz
-    printf("Nachalni Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+//     printf("Nachalni Vuprosi:\n");
+//     print_questions("quiz_questions.txt", true, true);
 
-    // Edit a question in the quiz
-    edit_question_in_file("quiz_questions.txt", 1);
+//     edit_question_in_file("quiz_questions.txt", 1);
 
-    // Print the updated questions in the quiz
-    printf("\nAktualizirani Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+//     printf("\nAktualizirani Vuprosi:\n");
+//     print_questions("quiz_questions.txt", true, true);
 
-    // Save the updated questions to a file
-    save_questions_to_file("quiz_questions_updated.txt");
+//     save_questions_to_file("quiz_questions_updated.txt");
 
-    // Load the questions from the updated file
-    load_questions_from_file("quiz_questions_updated.txt");
+//     load_questions_from_file("quiz_questions_updated.txt");
 
-    // Print the loaded questions
-    printf("\nZaredeni Vuprosi:\n");
-    print_questions("quiz_questions_updated.txt", true, true);
+//     printf("\nZaredeni Vuprosi:\n");
+//     print_questions("quiz_questions_updated.txt", true, true);
 
-    // Cleanup the quiz system
-    cleanup_quiz();
+//     cleanup_quiz();
 
-    return 0;
-}
+//     return 0;
+// }
