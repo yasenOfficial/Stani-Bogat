@@ -66,12 +66,16 @@ void add_question_to_file(const char *filename, char *text, int difficulty, char
         return;
     }
 
-    fprintf(file, "%s\n", text);
+    // fprintf(file, "%s\n", text);
+    write_encrypted(file, text);
     for (int i = 0; i < 4; i++) {
-        fprintf(file, "%s\n", options[i]);
+        // fprintf(file, "%s\n", options[i]);
+        write_encrypted(file, options[i]);
     }
-    fprintf(file, "%d\n", correct_index);
-    fprintf(file, "%d\n", difficulty);
+    // fprintf(file, "%d\n", correct_index);
+    write_encrypted(file, (const char *)&correct_index);
+    // fprintf(file, "%d\n", difficulty);
+    write_encrypted(file, (const char *)&difficulty);
 
     fclose(file);
 }
@@ -85,7 +89,7 @@ QuizQuestion* find_question_by_index(int index) {
         current_index++;
     }
 
-    return current_index == index ? current : NULL;
+    return current_index == index ? current : NULL; 
 }
 
 void edit_question_in_file(const char *filename, int question_number) {
@@ -152,12 +156,15 @@ void edit_question_in_file(const char *filename, int question_number) {
             question_to_edit->difficulty = new_difficulty;
 
             // Write to temporary file
-            fprintf(temp_file, "%s\n", new_text);
+            // fprintf(temp_file, "%s\n", new_text);
+            write_encrypted(temp_file, new_text);
             for (int i = 0; i < 4; i++) {
                 fprintf(temp_file, "%s\n", new_options[i]);
             }
-            fprintf(temp_file, "%d\n", new_correct_index);
-            fprintf(temp_file, "%d\n", new_difficulty);
+            // fprintf(temp_file, "%d\n", new_correct_index);
+            write_encrypted(temp_file, (const char *)&new_correct_index);
+            // fprintf(temp_file, "%d\n", new_difficulty);
+            write_encrypted(temp_file, (const char *)&new_difficulty);
 
             for (int i = 0; i < 6; i++) {
                 fgets(buffer, sizeof(buffer), file);
@@ -166,7 +173,8 @@ void edit_question_in_file(const char *filename, int question_number) {
             current_question++;
             line_count = 0;
         } else {
-            fprintf(temp_file, "%s", buffer);
+            // fprintf(temp_file, "%s", buffer);
+            write_encrypted(temp_file, buffer);
             line_count++;
             if (line_count == 6) {
                 line_count = 0;

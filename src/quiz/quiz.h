@@ -29,12 +29,12 @@ BST и Graph също биха били добри опции, но не бих�
 което съдържа свързан списък с въпроси за това ниво. Тази структура помага за ефективна категоризация и извличане.
 */
 
-void initialize_quiz();
-void add_question_to_file(const char *filename, char *text, int difficulty, char **options, int correct_index);
-void edit_question_in_file(const char *filename, int question_number);
-void save_questions_to_file(const char *filename);
-void load_questions_from_file(const char *filename);
-void cleanup_quiz();
-void print_questions(const char *filename, bool print_answers, bool print_difficulty);
+extern void initialize_quiz();
+extern void add_question_to_file(const char *filename, char *text, int difficulty, char **options, int correct_index);
+extern void edit_question_in_file(const char *filename, int question_number);
+extern void save_questions_to_file(const char *filename);
+extern void load_questions_from_file(const char *filename);
+extern void cleanup_quiz();
+extern void print_questions(const char *filename, bool print_answers, bool print_difficulty);
 
 #endif
