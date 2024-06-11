@@ -9,7 +9,8 @@
 #include "menu/menu.h"
 #include "quiz/quiz.h"
 
-unsigned char encryption_key[KEY_SIZE] = "This is a key";
+unsigned char encryption_key[] = "This is a key";
+const int KEY_SIZE = sizeof(encryption_key) - 1;
 
 int main() {
     initialize_quiz();
@@ -20,7 +21,7 @@ int main() {
     char *options2[] = {"Optsiya A", "Optsiya B", "Optsiya C", "Optsiya D"};
     add_question_to_file("quiz_questions.txt", "Vupros 2", 7, options2, 1);
 
-    printf("Nachalni Vuprosi:\n");
+    printf("\nNachalni Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
 
     edit_question_in_file("quiz_questions.txt", 1);

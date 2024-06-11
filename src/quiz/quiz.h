@@ -2,10 +2,14 @@
 #define QUIZ_H
 
 #define MAX_DIFFICULTY 10 
-#define MAX_QUESTIONS 1000
+#define MAX_QUESTIONS 100
+
+extern const int KEY_SIZE;
+extern unsigned char encryption_key[];
 
 #include <time.h>
 #include <stdbool.h>
+
 
 typedef struct quiz_question {
     char *question_text;
