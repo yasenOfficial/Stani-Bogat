@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
-#include <conio.h>
 
 #include "encrypt_decrypt/encrypt_decrypt.h"
 #include "menu/menu.h"

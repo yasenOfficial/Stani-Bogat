@@ -1,8 +1,17 @@
 #include "menu.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+    #include <conio.h>
+    #define GETCH() getch()
+#else
+    #define GETCH() getchar()
+#endif
 
 void option(unsigned char c, int *otg){
     if (c == 224 || c == 0) {
-        c = getch();
+        c = GETCH();
         if (c == 72) { // Стрелка нагоре
             (*otg)--;
             if (*otg < 1)
@@ -21,7 +30,6 @@ void jokerObadise();
 void jokerPublika();
 int menu()
 {
-    setlocale(LC_ALL, "");
     int joker5050 = 0, jokerObadise = 0, jokerPublika = 0;
     
     unsigned char c;
@@ -40,7 +48,7 @@ int menu()
         if (op == 4)printf(">4. Redaktirane na vupros\n");else printf(" 4. Redaktirane na vupros\n");
         if (op == 5)printf(">5. Izhod\n");else printf(" 5. Izhod\n");
 
-        c = getch();
+        c = GETCH();
 
         // Проверка за Ctrl + C (ASCII код 3)
         if (c == 3) {
@@ -54,7 +62,7 @@ int menu()
                 printf("Igrata zapochna!\n");
                 printf("Natisni kojto i da e klavish za da produljish...\n\n");
 
-                getch();  // Ralchev da pishe kod
+                GETCH();  // Ralchev da pishe kod
                 // Select random question
                 // press j for menu with jokers
                 int otg = 1;
@@ -69,7 +77,7 @@ int menu()
                     if (otg == 4)printf(">4. Otgovor D\n");else printf(" 4. Otgovor D\n");
                     if (otg == 5)printf(">5. Jokeri\n");else printf(" 5. Jokeri\n");
 
-                    c = getch();
+                    c = GETCH();
 
                     option(c, &otg);
 
@@ -96,7 +104,7 @@ int menu()
 
                 printf("Natisni kojto i da e klavish za da produljish...\n\n");
 
-                getch(); 
+                GETCH(); 
 
             }else if(op == 3) {
                 printf("Dobavqne na vupros\n");
