@@ -11,39 +11,46 @@ extern unsigned char encryption_key[];
 
 unsigned char* debug_encrypt(const char *text, const unsigned char *encryption_key, const char *mode) {
     size_t length = strlen(text);
-    unsigned char* result = (unsigned char*)malloc(length);
-    unsigned char* encrypted = (unsigned char*)malloc(length);
-    unsigned char* decryption = (unsigned char*)malloc(length);
-
+    unsigned char* result = (unsigned char*)malloc(length + 1); // Allocate memory for null terminator
+    if (!result) {
+        perror("Memory allocation failed");
+        return NULL;
+    }
     
     if (strcmp(mode, "encryption") == 0) {
-        printf("\nDefault: %s\n", text);
-        
-        xor_encrypt_decrypt((const unsigned char*)text, encrypted, length, encryption_key);
-        
-        printf("Encrypted: ");
-        for (size_t i = 0; i < length; i++) {
-            printf("%02X ", encrypted[i]);
+        unsigned char* encrypted = (unsigned char*)malloc(length); // Allocate memory for encrypted data
+        if (!encrypted) {
+            perror("Memory allocation failed");
+            free(result);
+            return NULL;
         }
-        printf("\n");
 
-        xor_encrypt_decrypt((const unsigned char*)encrypted, decryption, length, encryption_key);
-        printf("Decrypted (DEBUG): %s", decryption);
-        
-        result = encrypted;
+        xor_encrypt_decrypt((const unsigned char*)text, encrypted, length, encryption_key);
+        memcpy(result, encrypted, length); // Copy encrypted data to result
+        result[length] = '\0'; // Null terminate the string
+
+        free(encrypted); // Free memory allocated for encrypted
     } else if (strcmp(mode, "decryption") == 0) {
+        unsigned char* decryption = (unsigned char*)malloc(length); // Allocate memory for decrypted data
+        if (!decryption) {
+            perror("Memory allocation failed");
+            free(result);
+            return NULL;
+        }
+
         xor_encrypt_decrypt((const unsigned char*)text, decryption, length, encryption_key);
-        
-        result = decryption;
-        printf("Decrypted: %s\n", result);
+        memcpy(result, decryption, length); // Copy decrypted data to result
+        result[length] = '\0'; // Null terminate the string
+
+        free(decryption); // Free memory allocated for decryption
     } else {
         printf("Invalid mode\n");
+        free(result); // Free memory allocated for result
         return NULL;
     }
     
     return result;
 }
-
 
 void initialize_quiz() {
     head = NULL;
@@ -57,9 +64,22 @@ void add_question_to_file(const char *filename, char *text, int difficulty, char
     }
 
     new_question->question_text = strdup(text);
+    if (!new_question->question_text) {
+        perror("Memory allocation failed");
+        free(new_question);
+        return;
+    }
+
     for (int i = 0; i < 4; i++) {
         new_question->options[i] = strdup(options[i]);
+        if (!new_question->options[i]) {
+            perror("Memory allocation failed");
+            free(new_question->question_text);
+            free(new_question);
+            return;
+        }
     }
+
     new_question->correct_option_index = correct_index;
     new_question->difficulty = difficulty;
     new_question->next = head;
@@ -71,18 +91,41 @@ void add_question_to_file(const char *filename, char *text, int difficulty, char
         return;
     }
 
-    unsigned char* encrypted = debug_encrypt(text, encryption_key, "encryption");
-    fprintf(file, "%s\n", encrypted);
-
+    unsigned char* encrypted_text = debug_encrypt(text, encryption_key, "encryption");
+    if (!encrypted_text) {
+        fclose(file);
+        return;
+    }
+    fprintf(file, "%s\n", encrypted_text);
+    free(encrypted_text);
 
     for (int i = 0; i < 4; i++) {
-        encrypted = debug_encrypt(options[i], encryption_key, "encryption");
-        fprintf(file, "%s\n", encrypted);
+        unsigned char* encrypted_option = debug_encrypt(options[i], encryption_key, "encryption");
+        if (!encrypted_option) {
+            fclose(file);
+            return;
+        }
+        fprintf(file, "%s\n", encrypted_option);
+        free(encrypted_option); // Free memory allocated for encrypted_option
     }
-    encrypted = debug_encrypt((unsigned char*)&correct_index, encryption_key, "encryption");
-    fprintf(file, "%s\n", encrypted);
-    encrypted = debug_encrypt((unsigned char*)&difficulty, encryption_key, "encryption");
-    fprintf(file, "%s\n", encrypted);
+
+    // Encrypt and print correct index
+    unsigned char* encrypted_correct_index = debug_encrypt((char*)&correct_index, encryption_key, "encryption");
+    if (!encrypted_correct_index) {
+        fclose(file);
+        return;
+    }
+    fprintf(file, "%s\n", encrypted_correct_index);
+    free(encrypted_correct_index); // Free memory allocated for encrypted_correct_index
+
+    // Encrypt and print difficulty
+    unsigned char* encrypted_difficulty = debug_encrypt((char*)&difficulty, encryption_key, "encryption");
+    if (!encrypted_difficulty) {
+        fclose(file);
+        return;
+    }
+    fprintf(file, "%s\n", encrypted_difficulty);
+    free(encrypted_difficulty); // Free memory allocated for encrypted_difficulty
 
     fclose(file);
 }
@@ -276,16 +319,27 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
     char buffer[256];
     int index = 1;
     while (fgets(buffer, sizeof(buffer), file)) {
-        printf("Vupros %d: %s", index++, buffer);
+        
+        size_t length = strlen(buffer); // Length of the decrypted string
+        buffer[length - 1] = '\0'; // Remove newline character
+        unsigned char* decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+        printf("Vupros %d: %s\n", index++, decrypted);
+
         for (int i = 0; i < 4; i++) {
             fgets(buffer, sizeof(buffer), file);
-            printf("  Otgovor %d: %s", i + 1, buffer);
+            size_t length = strlen(buffer); // Length of the decrypted string
+            buffer[length - 1] = '\0'; // Remove newline character
+            unsigned char* decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+            printf("  Otgovor %d: %s\n", i + 1, decrypted);
+            free(decrypted); // Free decrypted buffer
         }
+
         fgets(buffer, sizeof(buffer), file);
         int correct_option;
         sscanf(buffer, "%d", &correct_option);
         if (print_answers) {
-            printf("  Veren otgovor: %d\n", correct_option + 1);
+            
+            printf("  Veren otgovor: %d\n", correct_option + 1); // have to decrypt
         }
 
         fgets(buffer, sizeof(buffer), file);

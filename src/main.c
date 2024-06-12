@@ -15,11 +15,11 @@ const int KEY_SIZE = sizeof(encryption_key) - 1;
 int main() {
     initialize_quiz();
 
-    char *options1[] = {"Optsiya 1", "Optsiya 2", "Optsiya 3", "Optsiya 4"};
-    add_question_to_file("quiz_questions.txt", "Vupros 1", 5, options1, 2);
+    char *options1[] = {"35", "36", "37", "38"};
+    add_question_to_file("quiz_questions.txt", "How old is andrew tate?", 5, options1, 3);
 
-    char *options2[] = {"Optsiya A", "Optsiya B", "Optsiya C", "Optsiya D"};
-    add_question_to_file("quiz_questions.txt", "Vupros 2", 7, options2, 1);
+    char *options2[] = {"A", "B", "C", "D"};
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 7, options2, 1);
 
     printf("\nNachalni Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
