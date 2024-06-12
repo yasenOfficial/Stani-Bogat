@@ -1,4 +1,4 @@
-#include "encrypt_decrypt.h"
+#include "test_encrypt_decrypt.h"
 
 const uint32_t A_LCG = 1664525;
 const uint32_t C_LCG = 1013904223;
@@ -94,27 +94,27 @@ extern void xor_encrypt_decrypt(const unsigned char *input, unsigned char *outpu
 
 int main()
 {
+    uint8_t var = 1;
+    const unsigned char *input = (const unsigned char *)&var;
 
-    const unsigned char input[] = "Vupros 1";
+    unsigned char encrypted[sizeof(var)];
+    unsigned char decrypted[sizeof(var)];
 
-    unsigned char encrypted[sizeof(input)];
-    unsigned char decrypted[sizeof(input)];
-
-    xor_encrypt_decrypt(input, encrypted, sizeof(input), key);
+    xor_encrypt_decrypt(input, encrypted, sizeof(var), key);
 
     printf("Encryptiran text: ");
-    for (size_t i = 0; i < sizeof(input); i++)
+    for (size_t i = 0; i < sizeof(var); i++)
     {
         printf("%02X ", encrypted[i]);
     }
     printf("\n");
 
-    xor_encrypt_decrypt(encrypted, decrypted, sizeof(input), key);
+    xor_encrypt_decrypt(encrypted, decrypted, sizeof(var), key);
 
     printf("Decryptiran text: ");
-    for (size_t i = 0; i < sizeof(input); i++)
+    for (size_t i = 0; i < sizeof(var); i++)
     {
-        printf("%c", decrypted[i]);
+        printf("%d", decrypted[i]);
     }
     printf("\n");
 

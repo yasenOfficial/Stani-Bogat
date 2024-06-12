@@ -1,5 +1,5 @@
-#ifndef ENCRYPT_DECRYPT_H
-#define ENCRYPT_DECRYPT_H
+#ifndef TEST_ENCRYPT_DECRYPT_H
+#define TEST_ENCRYPT_DECRYPT_H
 
 #include <stdint.h>
 #include <stddef.h> 
