@@ -217,7 +217,6 @@ void edit_question_in_file(const char *filename, int question_number)
             printf("Vuvedete nomer na pravilniq otgovor (1-4): ");
             scanf("%hhu", &new_correct_index);
             getchar(); // Consume the newline character
-            new_correct_index--;
             // printf("Correct index: %hhu\n", new_correct_index);
 
             uint8_t temp = new_correct_index; // make temp variable to store the correct index
@@ -412,7 +411,7 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
         xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
         if (print_answers)
         {
-            printf("  Pravilen otgovor: %d\n", correct_index[0] + 1);
+            printf("  Pravilen otgovor: %d\n", correct_index[0]);
         }
 
         if (print_difficulty)
