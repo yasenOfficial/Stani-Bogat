@@ -44,7 +44,7 @@ void show_question(int otg, int *options, int joker5050_used, int jokerObadise_u
     printf("\n");
 }
 
-int main()
+int menu()
 {
     int joker5050_used = 0, jokerObadise_used = 0, jokerPublika_used = 0;
     

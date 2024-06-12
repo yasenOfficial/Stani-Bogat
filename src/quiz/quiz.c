@@ -218,7 +218,7 @@ void edit_question_in_file(const char *filename, int question_number)
             scanf("%hhu", &new_correct_index);
             getchar(); // Consume the newline character
             new_correct_index--;
-            printf("Correct index: %hhu\n", new_correct_index);
+            // printf("Correct index: %hhu\n", new_correct_index);
 
             uint8_t temp = new_correct_index; // make temp variable to store the correct index
 
