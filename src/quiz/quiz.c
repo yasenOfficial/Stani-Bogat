@@ -12,7 +12,7 @@ extern unsigned char encryption_key[];
 unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_key, const char *mode)
 {
     size_t length = strlen(text);
-    unsigned char *result = (unsigned char *)malloc(length + 1); // Allocate memory for null terminator
+    unsigned char *result = (unsigned char *)malloc(length + 1); // Allocate memory za  text + '\0'
     if (!result)
     {
         perror("Memory allocation failed");
@@ -21,7 +21,7 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
 
     if (strcmp(mode, "encryption") == 0)
     {
-        unsigned char *encrypted = (unsigned char *)malloc(length); // Allocate memory for encrypted data
+        unsigned char *encrypted = (unsigned char *)malloc(length); 
         if (!encrypted)
         {
             perror("Memory allocation failed");
@@ -30,14 +30,14 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         }
 
         xor_encrypt_decrypt((const unsigned char *)text, encrypted, length, encryption_key);
-        memcpy(result, encrypted, length); // Copy encrypted data to result
-        result[length] = '\0';             // Null terminate the string
+        memcpy(result, encrypted, length);
+        result[length] = '\0';             
 
-        free(encrypted); // Free memory allocated for encrypted
+        free(encrypted);
     }
     else if (strcmp(mode, "decryption") == 0)
     {
-        unsigned char *decryption = (unsigned char *)malloc(length); // Allocate memory for decrypted data
+        unsigned char *decryption = (unsigned char *)malloc(length); 
         if (!decryption)
         {
             perror("Memory allocation failed");
@@ -46,15 +46,15 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         }
 
         xor_encrypt_decrypt((const unsigned char *)text, decryption, length, encryption_key);
-        memcpy(result, decryption, length); // Copy decrypted data to result
-        result[length] = '\0';              // Null terminate the string
+        memcpy(result, decryption, length); 
+        result[length] = '\0';              
 
-        free(decryption); // Free memory allocated for decryption
+        free(decryption); 
     }
     else
     {
         printf("Invalid mode\n");
-        free(result); // Free memory allocated for result
+        free(result); 
         return NULL;
     }
 
@@ -215,11 +215,11 @@ void edit_question_in_file(const char *filename, int question_number)
             }
 
             printf("Vuvedete nomer na pravilniq otgovor (1-4): ");
-            scanf("%s", &new_correct_index);
+            scanf("%hhu", &new_correct_index);
             new_correct_index--;
 
             printf("Vuvedete nivo na trudnost (1-10): ");
-            scanf("%s", &new_difficulty);
+            scanf("%hhu", &new_difficulty);
             getchar();
 
             // Update the dynamic memory
@@ -235,14 +235,25 @@ void edit_question_in_file(const char *filename, int question_number)
             question_to_edit->correct_option_index = new_correct_index;
             question_to_edit->difficulty = new_difficulty;
 
-            // Write to temporary file
-            fprintf(temp_file, "%s\n", new_text);
+            // Write encrypted data to temporary file
+            unsigned char *encrypted_text = debug_encrypt(new_text, encryption_key, "encryption");
+            fprintf(temp_file, "%s\n", encrypted_text);
+            free(encrypted_text);
+
             for (int i = 0; i < 4; i++)
             {
-                fprintf(temp_file, "%s\n", new_options[i]);
+                unsigned char *encrypted_option = debug_encrypt(new_options[i], encryption_key, "encryption");
+                fprintf(temp_file, "%s\n", encrypted_option);
+                free(encrypted_option);
             }
-            fprintf(temp_file, "%d\n", new_correct_index);
-            fprintf(temp_file, "%d\n", new_difficulty);
+
+            unsigned char encrypted_correct_index[sizeof(new_correct_index)];
+            xor_encrypt_decrypt((const unsigned char *)&new_correct_index, encrypted_correct_index, sizeof(new_correct_index), encryption_key);
+            fprintf(temp_file, "%s\n", encrypted_correct_index);
+
+            unsigned char encrypted_difficulty[sizeof(new_difficulty)];
+            xor_encrypt_decrypt((const unsigned char *)&new_difficulty, encrypted_difficulty, sizeof(new_difficulty), encryption_key);
+            fprintf(temp_file, "%s\n", encrypted_difficulty);
 
             for (int i = 0; i < 6; i++)
             {
@@ -270,6 +281,7 @@ void edit_question_in_file(const char *filename, int question_number)
     remove(filename);
     rename("temp.txt", filename);
 }
+
 
 void cleanup_quiz()
 {
