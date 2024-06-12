@@ -2,63 +2,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+
 #include "../encrypt_decrypt/encrypt_decrypt.h"
+
+/*
+# Step 1: Compile quiz.c
+gcc -c quiz.c -o quiz.o
+
+# Step 2: Compile encrypt_decrypt.c
+gcc -c encrypt_decrypt.c -o encrypt_decrypt.o
+
+# Step 3: Link quiz.o and encrypt_decrypt.o
+gcc quiz.o encrypt_decrypt.o -o quiz_program
+*/
+bool debug = true;
 
 static QuizQuestion *head = NULL;
 
-extern const int KEY_SIZE;
-extern unsigned char encryption_key[];
+extern encryption_key;
 
-unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_key, const char *mode)
+void write_encrypted(FILE *file, const char *data)
 {
-    size_t length = strlen(text);
-    unsigned char *result = (unsigned char *)malloc(length + 1); // Allocate memory za  text + '\0'
-    if (!result)
+    size_t len = strlen(data);
+    unsigned char *encrypted = (unsigned char *)malloc(len + 1);
+    xor_encrypt_decrypt((const unsigned char *)data, encrypted, len, encryption_key);
+    encrypted[len] = '\0';
+    fprintf(file, "%s\n", encrypted);
+}
+
+void read_and_decrypt(FILE *file, char *buffer, int bufsize)
+{
+    fgets(buffer, bufsize, file);
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n')
     {
-        perror("Memory allocation failed");
-        return NULL;
+        buffer[len - 1] = '\0';
+        len--;
     }
-
-    if (strcmp(mode, "encryption") == 0)
-    {
-        unsigned char *encrypted = (unsigned char *)malloc(length); 
-        if (!encrypted)
-        {
-            perror("Memory allocation failed");
-            free(result);
-            return NULL;
-        }
-
-        xor_encrypt_decrypt((const unsigned char *)text, encrypted, length, encryption_key);
-        memcpy(result, encrypted, length);
-        result[length] = '\0';             
-
-        free(encrypted);
-    }
-    else if (strcmp(mode, "decryption") == 0)
-    {
-        unsigned char *decryption = (unsigned char *)malloc(length); 
-        if (!decryption)
-        {
-            perror("Memory allocation failed");
-            free(result);
-            return NULL;
-        }
-
-        xor_encrypt_decrypt((const unsigned char *)text, decryption, length, encryption_key);
-        memcpy(result, decryption, length); 
-        result[length] = '\0';              
-
-        free(decryption); 
-    }
-    else
-    {
-        printf("Invalid mode\n");
-        free(result); 
-        return NULL;
-    }
-
-    return result;
+    xor_encrypt_decrypt((const unsigned char *)buffer, (unsigned char *)buffer, len, encryption_key);
 }
 
 void initialize_quiz()
@@ -66,8 +48,9 @@ void initialize_quiz()
     head = NULL;
 }
 
-void add_question_to_file(const char *filename, char *text, uint8_t difficulty, char **options, uint8_t correct_index)
+void add_question_to_file(const char *filename, char *text, int difficulty, char **options, int correct_index)
 {
+
     QuizQuestion *new_question = (QuizQuestion *)malloc(sizeof(QuizQuestion));
     if (!new_question)
     {
@@ -76,25 +59,10 @@ void add_question_to_file(const char *filename, char *text, uint8_t difficulty, 
     }
 
     new_question->question_text = strdup(text);
-    if (!new_question->question_text)
-    {
-        perror("Memory allocation failed");
-        free(new_question);
-        return;
-    }
-
     for (int i = 0; i < 4; i++)
     {
         new_question->options[i] = strdup(options[i]);
-        if (!new_question->options[i])
-        {
-            perror("Memory allocation failed");
-            free(new_question->question_text);
-            free(new_question);
-            return;
-        }
     }
-
     new_question->correct_option_index = correct_index;
     new_question->difficulty = difficulty;
     new_question->next = head;
@@ -106,46 +74,41 @@ void add_question_to_file(const char *filename, char *text, uint8_t difficulty, 
         perror("Ne moge da se otvori fail za zapis");
         return;
     }
-
-    unsigned char *encrypted_text = debug_encrypt(text, encryption_key, "encryption");
-    if (!encrypted_text)
+    if (debug)
     {
-        fclose(file);
-        return;
+        fprintf(file, "%s\n", text);
     }
-    fprintf(file, "%s\n", encrypted_text);
-    free(encrypted_text);
-
+    else
+    {
+        write_encrypted(file, text);
+    }
     for (int i = 0; i < 4; i++)
     {
-        unsigned char *encrypted_option = debug_encrypt(options[i], encryption_key, "encryption");
-        if (!encrypted_option)
+        if (debug)
         {
-            fclose(file);
-            return;
+            fprintf(file, "%s\n", options[i]);
         }
-        fprintf(file, "%s\n", encrypted_option);
-        free(encrypted_option); // Free memory allocated for encrypted_option
+        else
+        {
+            write_encrypted(file, options[i]);
+        }
     }
-
-    unsigned char encrypted_correct_index[sizeof(correct_index)];
-    xor_encrypt_decrypt((const unsigned char *)&correct_index, encrypted_correct_index, sizeof(correct_index), encryption_key);
-    // printf("Correct index: %d\n", correct_index);
-    // printf("Encryptiran text: ");
-    // for (size_t i = 0; i < sizeof(correct_index); i++)
-    // {
-    //     printf("%02X ", encrypted_correct_index[i]);
-    // }
-    // printf("\n");
-
-    fprintf(file, "%s\n", encrypted_correct_index);
-    free(encrypted_correct_index);
-
-    unsigned char encrypted_difficulty[sizeof(difficulty)];
-    xor_encrypt_decrypt((const unsigned char *)&difficulty, encrypted_difficulty, sizeof(difficulty), encryption_key);
-
-    fprintf(file, "%s\n", encrypted_difficulty);
-    free(encrypted_difficulty);
+    if (debug)
+    {
+        fprintf(file, "%d\n", correct_index);
+    }
+    else
+    {
+        write_encrypted(file, (const char *)&correct_index);
+    }
+    if (debug)
+    {
+        fprintf(file, "%d\n", difficulty);
+    }
+    else
+    {
+        write_encrypted(file, (const char *)&difficulty);
+    }
 
     fclose(file);
 }
@@ -164,6 +127,7 @@ QuizQuestion *find_question_by_index(int index)
     return current_index == index ? current : NULL;
 }
 
+// i dont think this works either
 void edit_question_in_file(const char *filename, int question_number)
 {
     FILE *file = fopen(filename, "r");
@@ -200,8 +164,8 @@ void edit_question_in_file(const char *filename, int question_number)
         {
             char new_text[256];
             char new_options[4][256];
-            uint8_t new_correct_index;
-            uint8_t new_difficulty;
+            int new_correct_index;
+            int new_difficulty;
 
             printf("Vuvedete nov text za vuprosa: ");
             fgets(new_text, sizeof(new_text), stdin);
@@ -215,11 +179,11 @@ void edit_question_in_file(const char *filename, int question_number)
             }
 
             printf("Vuvedete nomer na pravilniq otgovor (1-4): ");
-            scanf("%hhu", &new_correct_index);
+            scanf("%d", &new_correct_index);
             new_correct_index--;
 
             printf("Vuvedete nivo na trudnost (1-10): ");
-            scanf("%hhu", &new_difficulty);
+            scanf("%d", &new_difficulty);
             getchar();
 
             // Update the dynamic memory
@@ -235,25 +199,42 @@ void edit_question_in_file(const char *filename, int question_number)
             question_to_edit->correct_option_index = new_correct_index;
             question_to_edit->difficulty = new_difficulty;
 
-            // Write encrypted data to temporary file
-            unsigned char *encrypted_text = debug_encrypt(new_text, encryption_key, "encryption");
-            fprintf(temp_file, "%s\n", encrypted_text);
-            free(encrypted_text);
-
+            // Write to temporary file
+            if (debug)
+            {
+                fprintf(temp_file, "%s\n", new_text);
+            }
+            else
+            {
+                write_encrypted(temp_file, new_text);
+            }
             for (int i = 0; i < 4; i++)
             {
-                unsigned char *encrypted_option = debug_encrypt(new_options[i], encryption_key, "encryption");
-                fprintf(temp_file, "%s\n", encrypted_option);
-                free(encrypted_option);
+                if (debug)
+                {
+                    fprintf(temp_file, "%s\n", new_options[i]);
+                }
+                else
+                {
+                    write_encrypted(temp_file, new_options[i]);
+                }
             }
-
-            unsigned char encrypted_correct_index[sizeof(new_correct_index)];
-            xor_encrypt_decrypt((const unsigned char *)&new_correct_index, encrypted_correct_index, sizeof(new_correct_index), encryption_key);
-            fprintf(temp_file, "%s\n", encrypted_correct_index);
-
-            unsigned char encrypted_difficulty[sizeof(new_difficulty)];
-            xor_encrypt_decrypt((const unsigned char *)&new_difficulty, encrypted_difficulty, sizeof(new_difficulty), encryption_key);
-            fprintf(temp_file, "%s\n", encrypted_difficulty);
+            if (debug)
+            {
+                fprintf(temp_file, "%d\n", new_correct_index);
+            }
+            else
+            {
+                write_encrypted(temp_file, (const char *)&new_correct_index);
+            }
+            if (debug)
+            {
+                fprintf(temp_file, "%d\n", new_difficulty);
+            }
+            else
+            {
+                write_encrypted(temp_file, (const char *)&new_difficulty);
+            }
 
             for (int i = 0; i < 6; i++)
             {
@@ -281,7 +262,6 @@ void edit_question_in_file(const char *filename, int question_number)
     remove(filename);
     rename("temp.txt", filename);
 }
-
 
 void cleanup_quiz()
 {
@@ -367,6 +347,7 @@ void load_questions_from_file(const char *filename)
     fclose(file);
 }
 
+// print questions doesnt work
 void print_questions(const char *filename, bool print_answers, bool print_difficulty)
 {
     FILE *file = fopen(filename, "r");
@@ -380,42 +361,101 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
     int index = 1;
     while (fgets(buffer, sizeof(buffer), file))
     {
-
-        size_t length = strlen(buffer); // Length of the decrypted string
-        buffer[length - 1] = '\0';      // Remove newline character
-        unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-        printf("Vupros %d: %s\n", index++, decrypted);
+        if (debug)
+        {
+            printf("\n\nVupros %d: %s", index++, buffer);
+        }
+        else
+        {
+            // read_and_decrypt(file, buffer, sizeof(buffer));
+            xor_encrypt_decrypt((const unsigned char *)buffer, (unsigned char *)buffer, sizeof(buffer), encryption_key);
+            printf("\n\nVupros %d: %s\n", index++, buffer);
+        }
 
         for (int i = 0; i < 4; i++)
         {
             fgets(buffer, sizeof(buffer), file);
-            size_t length = strlen(buffer); // Length of the decrypted string
-            buffer[length - 1] = '\0';      // Remove newline character
-            unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-            printf("  Otgovor %d: %s\n", i + 1, decrypted);
-            free(decrypted); // Free decrypted buffer
+            if (debug)
+            {
+                printf("  Otgovor %d: %s", i + 1, buffer);
+            }
+            else
+            {
+                read_and_decrypt(file, buffer, sizeof(buffer));
+                printf("  Otgovor %d: %s\n", i + 1, buffer);
+            }
+        }
+        fgets(buffer, sizeof(buffer), file);
+        int correct_option;
+        sscanf(buffer, "%d", &correct_option);
+        if (print_answers)
+        {
+            if (debug)
+            {
+                printf("  Pravilen otgovor: %d\n", correct_option);
+            }
+            else
+            {
+                xor_encrypt_decrypt((const unsigned char *)&correct_option, (unsigned char *)&correct_option, sizeof(correct_option), encryption_key);
+                printf("  Pravilen otgovor: %d\n", correct_option);
+            }
         }
 
         fgets(buffer, sizeof(buffer), file);
-        unsigned char correct_index[sizeof(uint8_t)];
-        sscanf(buffer, "%s", correct_index);
-        xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
-        if (print_answers)
-        {
-            printf("  Pravilen otgovor: %d\n", correct_index[0]);
-        }
-
+        int difficulty;
+        sscanf(buffer, "%d", &difficulty);
         if (print_difficulty)
         {
-            fgets(buffer, sizeof(buffer), file);
-            unsigned char difficulty[sizeof(uint8_t)];
-            sscanf(buffer, "%s", difficulty);
-            xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
-            printf("  Trudnost: %d\n", difficulty[0]);
+            if (debug)
+            {
+                printf("  Trudnost: %d\n", difficulty);
+            }
+            else
+            {
+                xor_encrypt_decrypt((const unsigned char *)&difficulty, (unsigned char *)&difficulty, sizeof(difficulty), encryption_key);
+                printf("  Trudnost: %d\n", difficulty);
+            }
         }
-
-        
     }
 
     fclose(file);
 }
+
+// int main()
+// {
+//     // Initialize the quiz system
+//     initialize_quiz();
+
+//     // Add some questions to the quiz
+//     char *options1[] = {"35", "36", "37", "38"};
+//     add_question_to_file("quiz_questions.txt", "How old is andrew tate", 5, options1, 3);
+
+//     char *options2[] = {"A", "B", "C", "D"};
+//     add_question_to_file("quiz_questions.txt", "Tup vupros", 10, options2, 1);
+
+//     // Print all questions in the quiz
+//     printf("Nachalni Vuprosi:\n");
+//     print_questions("quiz_questions.txt", true, true);
+
+//     // Edit a question in the quiz
+//     edit_question_in_file("quiz_questions.txt", 1);
+
+//     // Print the updated questions in the quiz
+//     printf("\nAktualizirani Vuprosi:\n");
+//     print_questions("quiz_questions.txt", true, true);
+
+//     // Save the updated questions to a file
+//     // save_questions_to_file("quiz_questions_updated.txt");
+
+//     // // Load the questions from the updated file
+//     // load_questions_from_file("quiz_questions_updated.txt");
+
+//     // // Print the loaded questions
+//     // printf("\nZaredeni Vuprosi:\n");
+//     // print_questions("quiz_questions_updated.txt", true, true);
+
+//     // Cleanup the quiz system
+//     cleanup_quiz();
+
+//     return 0;
+// }

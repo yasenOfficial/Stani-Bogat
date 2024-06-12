@@ -9,7 +9,7 @@ OBJECTS = $(BUILD_DIR)/main.o \
           $(BUILD_DIR)/menu.o \
           $(BUILD_DIR)/quiz.o
 
-EXECUTABLE = $(BUILD_DIR)/quiz_program
+EXECUTABLE = $(BUILD_DIR)/stani_bogat
 
 all: $(BUILD_DIR) $(EXECUTABLE)
 

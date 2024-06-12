@@ -2,9 +2,7 @@
 #define MENU_H
 
 #include <stdio.h>
-#include <conio.h>
 #include <stdlib.h>
-#include <locale.h>
 
 #define OPTION_COUNT 5
 #define QUESTION_COUNT 10
@@ -16,3 +14,4 @@ void jokerPublika();
 int menu();
 
 #endif 
+

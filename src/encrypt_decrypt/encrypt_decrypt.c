@@ -1,9 +1,16 @@
 #include "encrypt_decrypt.h"
 
+const uint32_t A_LCG = 1664525;
+const uint32_t C_LCG = 1013904223;
+const uint32_t M = 0xFFFFFFFF; // 2^32
+
+// const unsigned char key[] = "my_secret_key_16";
+// const int KEY_SIZE = sizeof(key) - 1;
+
 // X_0 се инициализира с ключа на шифъра.
 uint32_t init_state(const unsigned char *key, size_t key_size) {
     uint32_t state = 0;
-    for (int i = 0; i < key_size; ++i) {
+    for (size_t i = 0; i < key_size; ++i) {
         state = (state * 31 + key[i]) % M;
     }
     return state;
@@ -42,7 +49,7 @@ uint32_t mcg(uint32_t *state) {
     // Следващото число се генерира, като се умножи текущото с A, се добави константата C и се вземе остатъкът при деление на M.
 }
 
-void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size_t length, const unsigned char *key) {
+extern void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size_t length, const unsigned char *key) {
     uint32_t encryptState = 0;
 
     for (int i = 0; i < KEY_SIZE; i++) {
@@ -72,37 +79,37 @@ void xor_encrypt_decrypt(const unsigned char *input, unsigned char *output, size
     }
 }
 
-/* Testvame koda
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+// Testvame koda
+// #include <stdio.h>
+// #include <stdint.h>
+// #include <stdlib.h>
+// #include <string.h>
 
-int main() {
-    const unsigned char key[KEY_SIZE] = "my_secret_key_16";
+// int main() {
 
-    const unsigned char input[] = "Hello, world!";
 
-    unsigned char encrypted[sizeof(input)];
-    unsigned char decrypted[sizeof(input)];
 
-    xor_encrypt_decrypt(input, encrypted, sizeof(input), key);
+//     const unsigned char input[] = "Hello, world!";
 
-    printf("Encryptiran text: ");
-    for (size_t i = 0; i < sizeof(input); i++) {
-        printf("%02X ", encrypted[i]);
-    }
-    printf("\n");
+//     unsigned char encrypted[sizeof(input)];
+//     unsigned char decrypted[sizeof(input)];
 
-    xor_encrypt_decrypt(encrypted, decrypted, sizeof(input), key);
+//     xor_encrypt_decrypt(input, encrypted, sizeof(input), key);
 
-    printf("Decryptiran text: ");
-    for (size_t i = 0; i < sizeof(input); i++) {
-        printf("%c", decrypted[i]);
-    }
-    printf("\n");
+//     printf("Encryptiran text: ");
+//     for (size_t i = 0; i < sizeof(input); i++) {
+//         printf("%02X ", encrypted[i]);
+//     }
+//     printf("\n");
 
-    return 0;
-}
+//     xor_encrypt_decrypt(encrypted, decrypted, sizeof(input), key);
 
-*/
+//     printf("Decryptiran text: ");
+//     for (size_t i = 0; i < sizeof(input); i++) {
+//         printf("%c", decrypted[i]);
+//     }
+//     printf("\n");
+
+//     return 0;
+// }
+

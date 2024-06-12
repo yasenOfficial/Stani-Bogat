@@ -4,24 +4,24 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
-#include <conio.h>
 
 #include "encrypt_decrypt/encrypt_decrypt.h"
 #include "menu/menu.h"
 #include "quiz/quiz.h"
 
-unsigned char encryption_key[KEY_SIZE] = "This is a key";
+unsigned char encryption_key[] = "This is a key";
+const int KEY_SIZE = sizeof(encryption_key) - 1;
 
 int main() {
     initialize_quiz();
 
-    char *options1[] = {"Optsiya 1", "Optsiya 2", "Optsiya 3", "Optsiya 4"};
-    add_question_to_file("quiz_questions.txt", "Vupros 1", 5, options1, 2);
+    char *options1[] = {"35", "36", "37", "38"};
+    add_question_to_file("quiz_questions.txt", "How old is andrew tate?", 5, options1, 3);
 
-    char *options2[] = {"Optsiya A", "Optsiya B", "Optsiya C", "Optsiya D"};
-    add_question_to_file("quiz_questions.txt", "Vupros 2", 7, options2, 1);
+    char *options2[] = {"A", "B", "C", "D"};
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 7, options2, 1);
 
-    printf("Nachalni Vuprosi:\n");
+    printf("\nNachalni Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
 
     edit_question_in_file("quiz_questions.txt", 1);
@@ -29,12 +29,12 @@ int main() {
     printf("\nAktualizirani Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
 
-    save_questions_to_file("quiz_questions_updated.txt");
+    // save_questions_to_file("quiz_questions_updated.txt");
 
-    load_questions_from_file("quiz_questions_updated.txt");
+    // load_questions_from_file("quiz_questions_updated.txt");
 
-    printf("\nZaredeni Vuprosi:\n");
-    print_questions("quiz_questions_updated.txt", true, true);
+    // printf("\nZaredeni Vuprosi:\n");
+    // print_questions("quiz_questions_updated.txt", true, true);
 
     cleanup_quiz();
 
