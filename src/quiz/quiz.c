@@ -216,11 +216,16 @@ void edit_question_in_file(const char *filename, int question_number)
 
             printf("Vuvedete nomer na pravilniq otgovor (1-4): ");
             scanf("%hhu", &new_correct_index);
+            getchar(); // Consume the newline character
             new_correct_index--;
+            // printf("Correct index: %hhu\n", new_correct_index);
+
+            uint8_t temp = new_correct_index; // make temp variable to store the correct index
 
             printf("Vuvedete nivo na trudnost (1-10): ");
             scanf("%hhu", &new_difficulty);
             getchar();
+
 
             // Update the dynamic memory
             free(question_to_edit->question_text);
@@ -246,10 +251,15 @@ void edit_question_in_file(const char *filename, int question_number)
                 fprintf(temp_file, "%s\n", encrypted_option);
                 free(encrypted_option);
             }
+            new_correct_index = temp;
 
+            // printf("Correct index: %hhu\n", new_correct_index);
             unsigned char encrypted_correct_index[sizeof(new_correct_index)];
             xor_encrypt_decrypt((const unsigned char *)&new_correct_index, encrypted_correct_index, sizeof(new_correct_index), encryption_key);
             fprintf(temp_file, "%s\n", encrypted_correct_index);
+
+
+            // fprintf(temp_file, "%d\n", new_correct_index);
 
             unsigned char encrypted_difficulty[sizeof(new_difficulty)];
             xor_encrypt_decrypt((const unsigned char *)&new_difficulty, encrypted_difficulty, sizeof(new_difficulty), encryption_key);
@@ -402,7 +412,7 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
         xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
         if (print_answers)
         {
-            printf("  Pravilen otgovor: %d\n", correct_index[0]);
+            printf("  Pravilen otgovor: %d\n", correct_index[0] + 1);
         }
 
         if (print_difficulty)
