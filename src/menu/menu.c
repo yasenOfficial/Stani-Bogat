@@ -29,6 +29,49 @@ void option(unsigned char c, int *otg, int count)
     }
 }
 
+void info_questions(char *question_text, char **options, int *correct_index, int *difficulty) {
+    // Prompt for the question text
+    printf("Vuvedete tekst na vuprosa: ");
+    if (fgets(question_text, 256, stdin) == NULL || is_empty_string(question_text)) {
+        printf("Greshka: Tekstut na vuprosa ne moje da bude prazen.\n");
+        return;
+    }
+    question_text[strcspn(question_text, "\n")] = '\0'; // Remove trailing newline
+
+    // Prompt for the options
+    for (int i = 0; i < 4; i++) {
+        char option[256];
+        printf("Vuvedete otgovor %d: ", i + 1);
+        if (fgets(option, sizeof(option), stdin) == NULL || is_empty_string(option)) {
+            printf("Greshka: Otgovor %d ne moje da bude prazen.\n", i + 1);
+            i--; // Retry the same option
+            continue;
+        }
+        option[strcspn(option, "\n")] = '\0'; // Remove trailing newline
+        options[i] = strdup(option); // Duplicate the string into options
+    }
+
+    // Prompt for the correct answer index
+    printf("Vuvedete nomera na pravilniya otgovor (1-4): ");
+    if (scanf("%d", correct_index) != 1 || *correct_index < 1 || *correct_index > 4) {
+        printf("Greshka: Nomerut na pravilniya otgovor trqbva da bude mejdu 1 i 4.\n");
+        while (getchar() != '\n'); // Clear the input buffer
+        return;
+    }
+
+    // Prompt for the difficulty
+    printf("Vuvedete trudnostta na vuprosa (1-10): ");
+    if (scanf("%d", difficulty) != 1 || *difficulty < 1 || *difficulty > 10) {
+        printf("Greshka: Trudnostta trqbva da bude mejdu 1 i 10.\n");
+        while (getchar() != '\n'); // Clear the input buffer
+        return;
+    }
+
+    // Clear the input buffer
+    while (getchar() != '\n');
+}
+
+
 // Jokeri
 void joker5050(char correct, int *options);
 void jokerObadise(char correct, int *options, int difficulty);
@@ -277,54 +320,13 @@ int menu()
             {
                 printf("Dobavqne na nov vupros\n");
 
-                char question_text[256];
+                char question_text[100];
+                int difficulty = 0;
+                int correct_index = 0;
+                int options[4];
 
-                printf("Vuvedete tekst na vuprosa: ");
-                fgets(question_text, sizeof(question_text), stdin);
-                if (is_empty_string(question_text))
-                {
-                    printf("Greshka: Tekstut na vuprosa ne moje da bude prazen.\n");
-                    continue;
-                }
-
-                question_text[strcspn(question_text, "\n")] = '\0'; // Premahvane na nov red
-
-                char *options[4];
-
-                for (int i = 0; i < 4; i++)
-                {
-                    char option[256];
-                    printf("Vuvedete otgovor %d: ", i + 1);
-                    fgets(option, sizeof(option), stdin);
-                    if (is_empty_string(option))
-                    {
-                        printf("Greshka: Otgovor %d ne moje da bude prazen.\n", i + 1);
-                        continue;
-                    }
-                    option[strcspn(option, "\n")] = '\0'; // Premahvane na nov red
-                    options[i] = strdup(option);
-                }
-
-                int correct_index;
-                printf("Vuvedete nomera na pravilniya otgovor (1-4): ");
-                if (scanf("%d", &correct_index) != 1 || correct_index < 1 || correct_index > 4)
-                {
-                    printf("Greshka: Nomerut na pravilniya otgovor trqbva da bude mejdu 1 i 4.\n");
-                    continue;
-                }
-
-                int difficulty;
-                printf("Vuvedete trudnostta na vuprosa (1-10): ");
-                if (scanf("%d", &difficulty) != 1 || difficulty < 1 || difficulty > 10)
-                {
-                    printf("Greshka: Trudnostta trqbva da bude mejdu 1 i 10.\n");
-                    continue;
-                }
-
-                // Premahvane na izlishniq nov red sled scanf
-                while ((getchar()) != '\n')
-                    ;
-
+                info_questions(question_text, options, correct_index, difficulty);
+     
                 add_question_to_file("quiz_questions.txt", question_text, difficulty, options, correct_index);
                 printf("Vuprosut e dobaven uspeshno.\n");
 
@@ -339,10 +341,16 @@ int menu()
                 scanf("%d", &choice);
 
                 int c;
-                while ((c = getchar()) != '\n' && c != EOF)
-                    ;
+                while ((c = getchar()) != '\n' && c != EOF);
 
-                edit_question_in_file("quiz_questions.txt", choice);
+                char new_question_text[100];
+                int new_difficulty = 0;
+                int new_correct_index = 0;
+                int new_options[4];
+
+                info_questions(new_question_text, new_options, new_correct_index, new_difficulty);
+
+                edit_question_in_file("quiz_questions.txt", choice, new_question_text, new_difficulty, new_options, new_correct_index);
                 GETCH();
             }
             else if (op == 5)
