@@ -164,7 +164,13 @@ QuizQuestion *find_question_by_index(int index)
     return current_index == index ? current : NULL;
 }
 
-void edit_question_in_file(const char *filename, int question_number)
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
+void edit_question_in_file(const char *filename, int question_number, const char *newText, uint8_t new_difficulty, const char *newOptions[], uint8_t newCorrect_index)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
@@ -176,111 +182,55 @@ void edit_question_in_file(const char *filename, int question_number)
     FILE *temp_file = fopen("temp.txt", "w");
     if (!temp_file)
     {
-        perror("Ne moge da se otvori vremenen fail za zapis");
+        perror("Ne moge da se otvori vremenniqt fail za pisane");
         fclose(file);
         return;
     }
 
     char buffer[256];
-    int current_question = 1;
     int line_count = 0;
-
-    QuizQuestion *question_to_edit = find_question_by_index(question_number);
-    if (!question_to_edit)
-    {
-        printf("Nqma vupros s takuv nomer\n");
-        fclose(file);
-        fclose(temp_file);
-        return;
-    }
+    int current_question = 1;
+    bool editing_question = false; // Flag to indicate if currently editing the specified question
 
     while (fgets(buffer, sizeof(buffer), file))
     {
-        if (line_count == 0 && current_question == question_number)
+        if (current_question == question_number) // If this is the question to edit
         {
-            char new_text[256];
-            char new_options[4][256];
-            uint8_t new_correct_index;
-            uint8_t new_difficulty;
-
-            printf("Vuvedete nov text za vuprosa: ");
-            fgets(new_text, sizeof(new_text), stdin);
-            new_text[strcspn(new_text, "\n")] = '\0';
-
-            for (int i = 0; i < 4; i++)
+            if (line_count == 0) // First line of the question
             {
-                printf("Vuvedete nov otgovor %d: ", i + 1);
-                fgets(new_options[i], sizeof(new_options[i]), stdin);
-                new_options[i][strcspn(new_options[i], "\n")] = '\0';
+                editing_question = true;
+                // Process and write the new question data
+                fprintf(temp_file, "%s\n", newText);
             }
-
-            printf("Vuvedete nomer na pravilniq otgovor (1-4): ");
-            scanf("%hhu", &new_correct_index);
-            getchar(); // Consume the newline character
-            // printf("Correct index: %hhu\n", new_correct_index);
-
-            uint8_t temp = new_correct_index; // make temp variable to store the correct index
-
-            printf("Vuvedete nivo na trudnost (1-10): ");
-            scanf("%hhu", &new_difficulty);
-            getchar();
-
-
-            // Update the dynamic memory
-            free(question_to_edit->question_text);
-            question_to_edit->question_text = strdup(new_text);
-
-            for (int i = 0; i < 4; i++)
+            else if (line_count <= 4) // Options lines
             {
-                free(question_to_edit->options[i]);
-                question_to_edit->options[i] = strdup(new_options[i]);
+                // Process and write the new options
+                fprintf(temp_file, "%s\n", newOptions[line_count - 1]);
             }
-
-            question_to_edit->correct_option_index = new_correct_index;
-            question_to_edit->difficulty = new_difficulty;
-
-            // Write encrypted data to temporary file
-            unsigned char *encrypted_text = debug_encrypt(new_text, encryption_key, "encryption");
-            fprintf(temp_file, "%s\n", encrypted_text);
-            free(encrypted_text);
-
-            for (int i = 0; i < 4; i++)
+            else if (line_count == 5) // Correct answer line
             {
-                unsigned char *encrypted_option = debug_encrypt(new_options[i], encryption_key, "encryption");
-                fprintf(temp_file, "%s\n", encrypted_option);
-                free(encrypted_option);
+                // Process and write the new correct answer
+                fprintf(temp_file, "%d\n", newCorrect_index);
             }
-            new_correct_index = temp;
-
-            // printf("Correct index: %hhu\n", new_correct_index);
-            unsigned char encrypted_correct_index[sizeof(new_correct_index)];
-            xor_encrypt_decrypt((const unsigned char *)&new_correct_index, encrypted_correct_index, sizeof(new_correct_index), encryption_key);
-            fprintf(temp_file, "%s\n", encrypted_correct_index);
-
-
-            // fprintf(temp_file, "%d\n", new_correct_index);
-
-            unsigned char encrypted_difficulty[sizeof(new_difficulty)];
-            xor_encrypt_decrypt((const unsigned char *)&new_difficulty, encrypted_difficulty, sizeof(new_difficulty), encryption_key);
-            fprintf(temp_file, "%s\n", encrypted_difficulty);
-
-            for (int i = 0; i < 6; i++)
+            else if (line_count == 6) // Difficulty line
             {
-                fgets(buffer, sizeof(buffer), file);
-            }
+                // Process and write the new difficulty
+                fprintf(temp_file, "%d\n", new_difficulty);
 
-            current_question++;
-            line_count = 0;
+                editing_question = false; // Finished editing this question
+            }
         }
         else
         {
+            // Copy non-question lines as they are
             fprintf(temp_file, "%s", buffer);
-            line_count++;
-            if (line_count == 6)
-            {
-                line_count = 0;
-                current_question++;
-            }
+        }
+
+        line_count++;
+        if (line_count == 7)
+        {
+            line_count = 0;
+            current_question++;
         }
     }
 
@@ -290,7 +240,6 @@ void edit_question_in_file(const char *filename, int question_number)
     remove(filename);
     rename("temp.txt", filename);
 }
-
 
 void cleanup_quiz()
 {
