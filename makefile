@@ -25,13 +25,16 @@ $(BUILD_DIR)/main.o: $(SRC_DIR)/main.c \
                      $(SRC_DIR)/quiz/quiz.h
 	$(CC) $(CFLAGS) -I$(SRC_DIR) -c $(SRC_DIR)/main.c -o $@
 
-$(BUILD_DIR)/encrypt_decrypt.o: $(SRC_DIR)/encrypt_decrypt/encrypt_decrypt.c $(SRC_DIR)/encrypt_decrypt/encrypt_decrypt.h
+$(BUILD_DIR)/encrypt_decrypt.o: $(SRC_DIR)/encrypt_decrypt/encrypt_decrypt.c \
+                                $(SRC_DIR)/encrypt_decrypt/encrypt_decrypt.h
 	$(CC) $(CFLAGS) -I$(SRC_DIR) -c $(SRC_DIR)/encrypt_decrypt/encrypt_decrypt.c -o $@
 
-$(BUILD_DIR)/menu.o: $(SRC_DIR)/menu/menu.c $(SRC_DIR)/menu/menu.h
+$(BUILD_DIR)/menu.o: $(SRC_DIR)/menu/menu.c \
+                     $(SRC_DIR)/menu/menu.h
 	$(CC) $(CFLAGS) -I$(SRC_DIR) -c $(SRC_DIR)/menu/menu.c -o $@
 
-$(BUILD_DIR)/quiz.o: $(SRC_DIR)/quiz/quiz.c $(SRC_DIR)/quiz/quiz.h
+$(BUILD_DIR)/quiz.o: $(SRC_DIR)/quiz/quiz.c \
+                     $(SRC_DIR)/quiz/quiz.h
 	$(CC) $(CFLAGS) -I$(SRC_DIR) -c $(SRC_DIR)/quiz/quiz.c -o $@
 
 clean:
