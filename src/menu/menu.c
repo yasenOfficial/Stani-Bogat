@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "menu.h"
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
@@ -21,10 +22,10 @@ void option(unsigned char c, int *otg, int count){
     }
 }
 
-//Jokeri
+// Jokeri
 void joker5050(char correct, int *options);
-void jokerObadise(char correct);
-void jokerPublika(char correct);
+void jokerObadise(char correct, int difficulty);
+void jokerPublika(char correct, int difficulty);
 
 void show_question(int otg, int *options, int joker5050_used, int jokerObadise_used, int jokerPublika_used) {
     system("cls");
@@ -44,7 +45,7 @@ void show_question(int otg, int *options, int joker5050_used, int jokerObadise_u
     printf("\n");
 }
 
-int main()
+int menu()
 {
     int joker5050_used = 0, jokerObadise_used = 0, jokerPublika_used = 0;
     
@@ -82,22 +83,21 @@ int main()
                 GETCH();  // Ralchev da pishe kod
                 // Select random question
                 // press j for menu with jokers
+                int question_difficulty = 1; // примерна трудност, може да се променя според въпроса
+                int options[4] = {1, 1, 1, 1}; // всички отговори са налични
                 int otg = 1;
-                int options[] = {1, 1, 1, 1}; // initially all options are available
-                char correct_answer = 'A'; // just a placeholder, should be dynamically assigned
+                char correct_answer = 'A'; // примерен отговор, може да се променя според въпроса
                 do {
                     show_question(otg, options, joker5050_used, jokerObadise_used, jokerPublika_used);
-
                     c = GETCH();
-
                     option(c, &otg, OPTION_COUNT);
 
                     if (c == 3) {
                         printf("\nProgramata e spryana s Ctrl + C\n");
                         return 0;
                     }
-
-                    if (c == 13) { // Enter
+                    
+                    if (c == 13) {
                         if (otg == 1 && options[0]) {
                             printf("Izbra otgovor A\n");
                             if (correct_answer == 'A') printf("Pravilen otgovor!\n");
@@ -119,37 +119,41 @@ int main()
                             else printf("Greshen otgovor!\n");
                             GETCH();
                         } else if (otg == 5) {
-                            int joker_menu = 1;
-                            do {
-                                system("cls");
-                                printf("Izbra joker: \n");
-                                if (joker_menu == 1) printf(">1. 50/50\n"); else printf(" 1. 50/50\n");
-                                if (joker_menu == 2) printf(">2. Obadise\n"); else printf(" 2. Obadise\n");
-                                if (joker_menu == 3) printf(">3. Publika\n"); else printf(" 3. Publika\n");
+                    int joker_op = 1;
+                    do {
+                        system("cls");
+                        printf("Izberete Joker:\n");
+                        if (joker_op == 1 && !joker5050_used) printf(">1. 50/50\n"); else if (!joker5050_used) printf(" 1. 50/50\n"); else printf(" 1. ---\n");
+                        if (joker_op == 2 && !jokerObadise_used) printf(">2. Obadise na priyatel\n"); else if (!jokerObadise_used) printf(" 2. Obadise na priyatel\n"); else printf(" 2. ---\n");
+                        if (joker_op == 3 && !jokerPublika_used) printf(">3. Pomosht ot publika\n"); else if (!jokerPublika_used) printf(" 3. Pomosht ot publika\n"); else printf(" 3. ---\n");
+                        if (joker_op == 4) printf(">4. Vurni se\n"); else printf(" 4. Vurni se\n");
 
-                                c = GETCH();
-                                option(c, &joker_menu, 3);
+                        c = GETCH();
+                        option(c, &joker_op, 4);
 
-                                if (c == 13) {
-                                    if (joker_menu == 1 && !joker5050_used) {
-                                        joker5050(correct_answer, options);
-                                        joker5050_used = 1;
-                                    } else if (joker_menu == 2 && !jokerObadise_used) {
-                                        jokerObadise(correct_answer);
-                                        jokerObadise_used = 1;
-                                    } else if (joker_menu == 3 && !jokerPublika_used) {
-                                        jokerPublika(correct_answer);
-                                        jokerPublika_used = 1;
-                                    } else {
-                                        printf("Joker veche izpolzvan ili nevaliden izbor!\n");
-                                        GETCH();
-                                    }
-                                }
-                            } while (c != 27 && c != 13);
+                        if (c == 3) {
+                            printf("\nProgramata e spryana s Ctrl + C\n");
+                            return 0;
                         }
-                    }
 
-                } while (c != 27);
+                        if (c == 13) {
+                            if (joker_op == 1 && !joker5050_used) {
+                                joker5050('A', options); // Примерен верен отговор
+                                joker5050_used = 1;
+                            } else if (joker_op == 2 && !jokerObadise_used) {
+                                jokerObadise('A', question_difficulty); // Примерен верен отговор
+                                jokerObadise_used = 1;
+                            } else if (joker_op == 3 && !jokerPublika_used) {
+                                jokerPublika('A', question_difficulty); // Примерен верен отговор
+                                jokerPublika_used = 1;
+                            } else if (joker_op == 4) {
+                                break;
+                            }
+                        }
+                    } while (c != 13 || joker_op != 4);
+                }
+                    }
+            } while (c != 27); // Изход от играта с ESC
 
             } else if (op == 2) {
                 printf("----------------------------------------------------------------------------------------------\n");
@@ -196,12 +200,20 @@ void joker5050(char correct, int *options) {
             removed++;
         }
     }
-    printf("50/50 joker izpolzvan!\n");
+    printf("50/50 joker izpolzvan!\\n");
     GETCH();
 }
 
-void jokerObadise(char correct) {
-    int probability = 80; // adjust this based on question difficulty
+void jokerObadise(char correct, int difficulty) {
+    int probability;
+    if (difficulty <= 3) {
+        probability = 80;
+    } else if (difficulty <= 6) {
+        probability = 60;
+    } else {
+        probability = 30;
+    }
+    
     int chance = rand() % 100;
     char friend_answer;
     
@@ -218,8 +230,16 @@ void jokerObadise(char correct) {
     GETCH();
 }
 
-void jokerPublika(char correct) {
-    int probability = 80; // adjust this based on question difficulty
+void jokerPublika(char correct, int difficulty) {
+    int probability;
+    if (difficulty <= 3) {
+        probability = 80;
+    } else if (difficulty <= 6) {
+        probability = 60;
+    } else {
+        probability = 30;
+    }
+    
     int votes[4] = {0, 0, 0, 0};
     int total_votes = 100;
 
@@ -241,9 +261,9 @@ void jokerPublika(char correct) {
     votes[correct - 'A'] += total_votes; // remaining votes go to the correct answer
 
     printf("Publikata glasuva taka:\n");
-    printf("A: %d%%\n", votes[0]);
-    printf("B: %d%%\n", votes[1]);
-    printf("C: %d%%\n", votes[2]);
-    printf("D: %d%%\n", votes[3]);
+    printf("A: %d%%\\n", votes[0]);
+    printf("B: %d%%\\n", votes[1]);
+    printf("C: %d%%\\n", votes[2]);
+    printf("D: %d%%\\n", votes[3]);
     GETCH();
 }
