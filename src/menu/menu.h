@@ -9,8 +9,8 @@
 
 void option(unsigned char c, int *otg, int count);
 void joker5050(char correct, int *options);
-void jokerObadise(char correct, int question_difficulty);
-void jokerPublika(char correct, int question_difficulty);
+void jokerObadise(char correct, int *options, int difficulty);
+void jokerPublika(char correct, int *options, int difficulty);
 
 int menu();
 

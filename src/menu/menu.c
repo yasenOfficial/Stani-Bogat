@@ -1,11 +1,12 @@
-#include <stdio.h>
 #include "menu.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
 #define GETCH() getch()
 
 #define OPTION_COUNT 5
+#define QUESTION_COUNT 10
 
 void option(unsigned char c, int *otg, int count){
     if (c == 224 || c == 0) {
@@ -24,8 +25,8 @@ void option(unsigned char c, int *otg, int count){
 
 // Jokeri
 void joker5050(char correct, int *options);
-void jokerObadise(char correct, int difficulty);
-void jokerPublika(char correct, int difficulty);
+void jokerObadise(char correct, int *options, int difficulty);
+void jokerPublika(char correct, int *options, int difficulty);
 
 void show_question(int otg, int *options, int joker5050_used, int jokerObadise_used, int jokerPublika_used) {
     system("cls");
@@ -83,7 +84,7 @@ int menu()
                 GETCH();  // Ralchev da pishe kod
                 // Select random question
                 // press j for menu with jokers
-                int question_difficulty = 1; // примерна трудност, може да се променя според въпроса
+                int question_difficulty = 9; // примерна трудност, може да се променя според въпроса
                 int options[4] = {1, 1, 1, 1}; // всички отговори са налични
                 int otg = 1;
                 char correct_answer = 'A'; // примерен отговор, може да се променя според въпроса
@@ -141,10 +142,10 @@ int menu()
                                 joker5050('A', options); // Примерен верен отговор
                                 joker5050_used = 1;
                             } else if (joker_op == 2 && !jokerObadise_used) {
-                                jokerObadise('A', question_difficulty); // Примерен верен отговор
+                                jokerObadise('A', options, question_difficulty); // Примерен верен отговор
                                 jokerObadise_used = 1;
                             } else if (joker_op == 3 && !jokerPublika_used) {
-                                jokerPublika('A', question_difficulty); // Примерен верен отговор
+                                jokerPublika('A', options, question_difficulty); // Примерен верен отговор
                                 jokerPublika_used = 1;
                             } else if (joker_op == 4) {
                                 break;
@@ -204,7 +205,7 @@ void joker5050(char correct, int *options) {
     GETCH();
 }
 
-void jokerObadise(char correct, int difficulty) {
+void jokerObadise(char correct, int *options, int difficulty) {
     int probability;
     if (difficulty <= 3) {
         probability = 80;
@@ -217,12 +218,19 @@ void jokerObadise(char correct, int difficulty) {
     int chance = rand() % 100;
     char friend_answer;
     
+    char available_options[2];
+    int count = 0;
+    for (int i = 0; i < 4; i++) {
+        if (options[i]) {
+            available_options[count++] = 'A' + i;
+        }
+    }
+
     if (chance < probability) {
-        friend_answer = correct; // friend gives correct answer
+        friend_answer = correct;
     } else {
-        // friend gives random wrong answer
         do {
-            friend_answer = 'A' + (rand() % 4);
+            friend_answer = available_options[rand() % count];
         } while (friend_answer == correct);
     }
     
@@ -230,7 +238,7 @@ void jokerObadise(char correct, int difficulty) {
     GETCH();
 }
 
-void jokerPublika(char correct, int difficulty) {
+void jokerPublika(char correct, int *options, int difficulty) {
     int probability;
     if (difficulty <= 3) {
         probability = 80;
@@ -243,27 +251,33 @@ void jokerPublika(char correct, int difficulty) {
     int votes[4] = {0, 0, 0, 0};
     int total_votes = 100;
 
+    char available_options[2];
+    int count = 0;
+    for (int i = 0; i < 4; i++) {
+        if (options[i]) {
+            available_options[count++] = 'A' + i;
+        }
+    }
+
     if (rand() % 100 < probability) {
-        // most votes go to the correct answer
         votes[correct - 'A'] = rand() % (total_votes / 2) + (total_votes / 2);
     } else {
-        // distribute votes randomly
         votes[correct - 'A'] = rand() % (total_votes / 4);
     }
     total_votes -= votes[correct - 'A'];
 
     for (int i = 0; i < 4; i++) {
-        if (i != correct - 'A') {
+        if (options[i] && i != correct - 'A') {
             votes[i] = rand() % total_votes;
             total_votes -= votes[i];
         }
     }
-    votes[correct - 'A'] += total_votes; // remaining votes go to the correct answer
+    votes[correct - 'A'] += total_votes;
 
     printf("Publikata glasuva taka:\n");
-    printf("A: %d%%\\n", votes[0]);
-    printf("B: %d%%\\n", votes[1]);
-    printf("C: %d%%\\n", votes[2]);
-    printf("D: %d%%\\n", votes[3]);
+    printf("A: %d%%\n", votes[0]);
+    printf("B: %d%%\n", votes[1]);
+    printf("C: %d%%\n", votes[2]);
+    printf("D: %d%%\n", votes[3]);
     GETCH();
 }
