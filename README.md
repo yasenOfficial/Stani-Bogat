@@ -9,7 +9,7 @@ A project for 10th grade Proizvodstvena Praktika
 
 ```make```
 
-```./build/main ```
+```.\build\stani_bogat ```
 
 ```make clean```
 
