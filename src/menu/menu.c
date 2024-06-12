@@ -2,6 +2,7 @@
 #include "../quiz/quiz.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <conio.h>
 #define GETCH() getch()
@@ -30,15 +31,14 @@ void option(unsigned char c, int *otg, int count)
 }
 
 void info_questions(char *question_text, char **options, int *correct_index, int *difficulty) {
-    // Prompt for the question text
+
     printf("Vuvedete tekst na vuprosa: ");
     if (fgets(question_text, 256, stdin) == NULL || is_empty_string(question_text)) {
         printf("Greshka: Tekstut na vuprosa ne moje da bude prazen.\n");
         return;
     }
-    question_text[strcspn(question_text, "\n")] = '\0'; // Remove trailing newline
+    question_text[strcspn(question_text, "\n")] = '\0'; //Maha noviq red
 
-    // Prompt for the options
     for (int i = 0; i < 4; i++) {
         char option[256];
         printf("Vuvedete otgovor %d: ", i + 1);
@@ -47,27 +47,25 @@ void info_questions(char *question_text, char **options, int *correct_index, int
             i--; // Retry the same option
             continue;
         }
-        option[strcspn(option, "\n")] = '\0'; // Remove trailing newline
-        options[i] = strdup(option); // Duplicate the string into options
+        option[strcspn(option, "\n")] = '\0'; // Maha noviq red
+        options[i] = strdup(option); // dublikira stringa v options
     }
 
-    // Prompt for the correct answer index
     printf("Vuvedete nomera na pravilniya otgovor (1-4): ");
     if (scanf("%d", correct_index) != 1 || *correct_index < 1 || *correct_index > 4) {
         printf("Greshka: Nomerut na pravilniya otgovor trqbva da bude mejdu 1 i 4.\n");
-        while (getchar() != '\n'); // Clear the input buffer
+        while (getchar() != '\n'); //  input buffer
         return;
     }
 
-    // Prompt for the difficulty
     printf("Vuvedete trudnostta na vuprosa (1-10): ");
     if (scanf("%d", difficulty) != 1 || *difficulty < 1 || *difficulty > 10) {
         printf("Greshka: Trudnostta trqbva da bude mejdu 1 i 10.\n");
-        while (getchar() != '\n'); // Clear the input buffer
+        while (getchar() != '\n'); // input buffer
         return;
     }
 
-    // Clear the input buffer
+    //input buffer
     while (getchar() != '\n');
 }
 
@@ -305,6 +303,8 @@ int menu()
             }
             else if (op == 2)
             {
+                system("cls");
+
                 printf("----------------------------------------------------------------------------------------------\n");
                 printf("1. Imate 10 vyprosa s narastvashta trudnost.\n");
                 printf("2. Vseki vypros ima 4 vyzmozhni otgovora, no samo edin e praven.\n");
@@ -321,8 +321,7 @@ int menu()
                 printf("Dobavqne na nov vupros\n");
 
                 char question_text[100];
-                int difficulty = 0;
-                int correct_index = 0;
+                int difficulty, correct_index;
                 int options[4];
 
                 info_questions(question_text, options, correct_index, difficulty);
@@ -344,8 +343,7 @@ int menu()
                 while ((c = getchar()) != '\n' && c != EOF);
 
                 char new_question_text[100];
-                int new_difficulty = 0;
-                int new_correct_index = 0;
+                int new_difficulty, new_correct_index;
                 int new_options[4];
 
                 info_questions(new_question_text, new_options, new_correct_index, new_difficulty);
