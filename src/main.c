@@ -21,10 +21,10 @@ int main() {
     char *options2[] = {"A", "B", "C", "D"};
     add_question_to_file("quiz_questions.txt", "ABCD Vupros", 7, options2, 1);
 
+    menu();
+
     printf("\nNachalni Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
-
-    edit_question_in_file("quiz_questions.txt", 1);
 
     printf("\nAktualizirani Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
