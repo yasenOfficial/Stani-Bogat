@@ -150,26 +150,6 @@ void add_question_to_file(const char *filename, char *text, uint8_t difficulty, 
     fclose(file);
 }
 
-QuizQuestion *find_question_by_index(int index)
-{
-    QuizQuestion *current = head;
-    int current_index = 1;
-
-    while (current && current_index < index)
-    {
-        current = current->next;
-        current_index++;
-    }
-
-    return current_index == index ? current : NULL;
-}
-
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-
 void edit_question_in_file(const char *filename, int question_number, const char *newText, uint8_t new_difficulty, const char *newOptions[], uint8_t newCorrect_index)
 {
     FILE *file = fopen(filename, "r");
@@ -187,7 +167,7 @@ void edit_question_in_file(const char *filename, int question_number, const char
         return;
     }
 
-    char buffer[256];
+    char buffer[255];
     int line_count = 0;
     int current_question = 1;
     bool editing_question = false; // Flag to indicate if currently editing the specified question
@@ -199,23 +179,45 @@ void edit_question_in_file(const char *filename, int question_number, const char
             if (line_count == 0) // First line of the question
             {
                 editing_question = true;
-                // Process and write the new question data
-                fprintf(temp_file, "%s\n", newText);
+                // Encrypt the new question text
+                unsigned char *encrypted_text = debug_encrypt(newText, encryption_key, "encryption");
+                if (!encrypted_text)
+                {
+                    fclose(file);
+                    fclose(temp_file);
+                    return;
+                }
+                fprintf(temp_file, "%s\n", encrypted_text);
+                free(encrypted_text);
             }
             else if (line_count <= 4) // Options lines
             {
-                // Process and write the new options
-                fprintf(temp_file, "%s\n", newOptions[line_count - 1]);
+                // Encrypt and write the new options
+                unsigned char *encrypted_option = debug_encrypt(newOptions[line_count - 1], encryption_key, "encryption");
+                if (!encrypted_option)
+                {
+                    fclose(file);
+                    fclose(temp_file);
+                    return;
+                }
+                fprintf(temp_file, "%s\n", encrypted_option);
+                free(encrypted_option);
             }
             else if (line_count == 5) // Correct answer line
             {
-                // Process and write the new correct answer
-                fprintf(temp_file, "%d\n", newCorrect_index);
+                // Encrypt and write the new correct answer
+                unsigned char encrypted_correct_index[sizeof(newCorrect_index)];
+                xor_encrypt_decrypt((const unsigned char *)&newCorrect_index, encrypted_correct_index, sizeof(newCorrect_index), encryption_key);
+                fwrite(encrypted_correct_index, sizeof(unsigned char), sizeof(newCorrect_index), temp_file);
+                fwrite("\n", sizeof(char), 1, temp_file); // Write newline
             }
             else if (line_count == 6) // Difficulty line
             {
-                // Process and write the new difficulty
-                fprintf(temp_file, "%d\n", new_difficulty);
+                // Write new difficulty to the file
+                unsigned char encrypted_difficulty[sizeof(new_difficulty)];
+                xor_encrypt_decrypt((const unsigned char *)&new_difficulty, encrypted_difficulty, sizeof(new_difficulty), encryption_key);
+                fwrite(encrypted_difficulty, sizeof(unsigned char), sizeof(new_difficulty), temp_file);
+                fwrite("\n", sizeof(char), 1, temp_file); // Write newline
 
                 editing_question = false; // Finished editing this question
             }
