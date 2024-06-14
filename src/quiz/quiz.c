@@ -419,3 +419,95 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
 
     fclose(file);
 }
+
+void find_question_by_difficulty(uint8_t difficulty, char **text, char ***options, uint8_t *correct_index, bool *has_found) {
+    QuizQuestion *current = head;
+    QuizQuestion *questions_with_difficulty[10]; // Assuming maximum 10 questions per difficulty
+    int count = 0;
+
+    // Find all questions with the given difficulty
+    while (current != NULL) {
+        if (current->difficulty == difficulty) {
+            questions_with_difficulty[count++] = current;
+        }
+        current = current->next;
+    }
+
+    if (count == 0) {
+        *has_found = false;
+        *text = NULL;
+        *options = NULL;
+        *correct_index = 0;
+        return;
+    }
+
+    // Randomly select one question from the found questions
+    int random_index = rand() % count;
+    QuizQuestion *selected_question = questions_with_difficulty[random_index];
+
+    // Set return values
+    *has_found = true;
+
+    // Decrypt and set the question text
+    unsigned char *decrypted_text = debug_encrypt(selected_question->question_text, encryption_key, "decryption");
+    if (decrypted_text == NULL) {
+        *has_found = false;
+        return;
+    }
+    *text = strdup((char *)decrypted_text);
+    free(decrypted_text);
+
+    if (*text == NULL) {
+        *has_found = false;
+        return;
+    }
+
+    // Decrypt and set the correct option index
+    unsigned char decrypted_correct_index[sizeof(uint8_t)];
+    xor_encrypt_decrypt((const unsigned char *)&selected_question->correct_option_index, decrypted_correct_index, sizeof(uint8_t), encryption_key);
+    *correct_index = *(uint8_t *)decrypted_correct_index;
+
+    // Allocate memory for options array
+    *options = (char **)malloc(4 * sizeof(char *));
+    if (*options == NULL) {
+        perror("Memory allocation failed");
+        *has_found = false;
+        free(*text);
+        *text = NULL;
+        *correct_index = 0;
+        return;
+    }
+
+    // Decrypt and copy options
+    for (int i = 0; i < 4; i++) {
+        unsigned char *decrypted_option = debug_encrypt(selected_question->options[i], encryption_key, "decryption");
+        if (decrypted_option == NULL) {
+            perror("Decryption failed");
+            *has_found = false;
+            free(*text);
+            for (int j = 0; j < i; j++) {
+                free((*options)[j]);
+            }
+            free(*options);
+            *text = NULL;
+            *options = NULL;
+            *correct_index = 0;
+            return;
+        }
+        (*options)[i] = strdup((char *)decrypted_option);
+        free(decrypted_option);
+        if ((*options)[i] == NULL) {
+            perror("Memory allocation failed");
+            *has_found = false;
+            free(*text);
+            for (int j = 0; j < i; j++) {
+                free((*options)[j]);
+            }
+            free(*options);
+            *text = NULL;
+            *options = NULL;
+            *correct_index = 0;
+            return;
+        }
+    }
+}
