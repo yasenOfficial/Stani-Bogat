@@ -265,20 +265,32 @@ void save_questions_to_file(const char *filename)
     FILE *file = fopen(filename, "w");
     if (!file)
     {
-        perror("Ne moge da se otvori fail za zapis");
+        perror("Failed to open file for writing");
         return;
     }
 
     QuizQuestion *current = head;
     while (current)
     {
-        fprintf(file, "%s\n", current->question_text);
+        unsigned char *encrypted_text = debug_encrypt(current->question_text, encryption_key, "encryption");
+        fprintf(file, "%s\n", encrypted_text);
+        free(encrypted_text);
+
         for (int i = 0; i < 4; i++)
         {
-            fprintf(file, "%s\n", current->options[i]);
+            unsigned char *encrypted_option = debug_encrypt(current->options[i], encryption_key, "encryption");
+            fprintf(file, "%s\n", encrypted_option);
+            free(encrypted_option);
         }
-        fprintf(file, "%d\n", current->correct_option_index);
-        fprintf(file, "%d\n", current->difficulty);
+
+        unsigned char encrypted_correct_index[sizeof(uint8_t)];
+        xor_encrypt_decrypt((const unsigned char *)&current->correct_option_index, encrypted_correct_index, sizeof(uint8_t), encryption_key);
+        fprintf(file, "%02X\n", encrypted_correct_index[0]);
+
+        unsigned char encrypted_difficulty[sizeof(uint8_t)];
+        xor_encrypt_decrypt((const unsigned char *)&current->difficulty, encrypted_difficulty, sizeof(uint8_t), encryption_key);
+        fprintf(file, "%02X\n", encrypted_difficulty[0]);
+
         current = current->next;
     }
 
@@ -290,7 +302,7 @@ void load_questions_from_file(const char *filename)
     FILE *file = fopen(filename, "r");
     if (!file)
     {
-        perror("Ne moge da se otvori fail za chetene");
+        perror("Failed to open file for reading");
         return;
     }
 
@@ -302,23 +314,51 @@ void load_questions_from_file(const char *filename)
         QuizQuestion *new_question = (QuizQuestion *)malloc(sizeof(QuizQuestion));
         if (!new_question)
         {
-            perror("Ne moje da se zaredi vuprosa v pametta");
+            perror("Memory allocation failed");
             fclose(file);
             return;
         }
 
         buffer[strcspn(buffer, "\n")] = '\0';
-        new_question->question_text = strdup(buffer);
+        unsigned char *decrypted_text = debug_encrypt(buffer, encryption_key, "decryption");
+        new_question->question_text = strdup((char *)decrypted_text);
+        free(decrypted_text);
 
         for (int i = 0; i < 4; i++)
         {
-            fgets(buffer, sizeof(buffer), file);
+            if (!fgets(buffer, sizeof(buffer), file)) {
+                perror("Unexpected end of file while reading options");
+                free(new_question);
+                fclose(file);
+                return;
+            }
             buffer[strcspn(buffer, "\n")] = '\0';
-            new_question->options[i] = strdup(buffer);
+            unsigned char *decrypted_option = debug_encrypt(buffer, encryption_key, "decryption");
+            new_question->options[i] = strdup((char *)decrypted_option);
+            free(decrypted_option);
         }
 
-        fscanf(file, "%d\n", &new_question->correct_option_index);
-        fscanf(file, "%d\n", &new_question->difficulty);
+        if (!fgets(buffer, sizeof(buffer), file)) {
+            perror("Unexpected end of file while reading correct option index");
+            free(new_question);
+            fclose(file);
+            return;
+        }
+        buffer[strcspn(buffer, "\n")] = '\0';
+        unsigned char decrypted_correct_index[sizeof(uint8_t)];
+        xor_encrypt_decrypt((const unsigned char *)buffer, decrypted_correct_index, sizeof(uint8_t), encryption_key);
+        new_question->correct_option_index = *(uint8_t *)decrypted_correct_index;
+
+        if (!fgets(buffer, sizeof(buffer), file)) {
+            perror("Unexpected end of file while reading difficulty");
+            free(new_question);
+            fclose(file);
+            return;
+        }
+        buffer[strcspn(buffer, "\n")] = '\0';
+        unsigned char decrypted_difficulty[sizeof(uint8_t)];
+        xor_encrypt_decrypt((const unsigned char *)buffer, decrypted_difficulty, sizeof(uint8_t), encryption_key);
+        new_question->difficulty = *(uint8_t *)decrypted_difficulty;
 
         new_question->next = head;
         head = new_question;
