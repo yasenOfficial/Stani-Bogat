@@ -40,6 +40,7 @@ extern void edit_question_in_file(const char *filename, int question_number, con
 extern void save_questions_to_file(const char *filename);
 extern void load_questions_from_file(const char *filename);
 extern void cleanup_quiz();
-extern void print_questions(const char *filename, bool print_answers, bool print_difficulty);
+extern void load_questions(const char *filename,char* options, char* text,int* correct_option, int* Idifficulty, bool found );
+
 
 #endif
