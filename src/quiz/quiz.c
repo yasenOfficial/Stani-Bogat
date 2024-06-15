@@ -367,24 +367,23 @@ void load_questions_from_file(const char *filename)
     fclose(file);
 }
 
-void load_questions(const char *filename,char* options, char* text,int* correct_option, int* Idifficulty, bool found )
+void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* Idifficulty, bool* found )
 {
     FILE *file = fopen(filename, "r");
     if (!file)
     {
         perror("Ne moge da se otvori fail za chetene");
-        found = false;
+        *found = false;
         return;
     }
     if(found == true){
         char buffer[256];
-        int index = 1;
         while (fgets(buffer, sizeof(buffer), file))
         {
             size_t length = strlen(buffer); // Length of the decrypted string
             buffer[length - 1] = '\0';      // Remove newline character
             unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-            text = decrypted;
+            strcpy(text, decrypted);
 
             for (int i = 0; i < 4; i++)
             {
@@ -392,7 +391,7 @@ void load_questions(const char *filename,char* options, char* text,int* correct_
                 size_t length = strlen(buffer); // Length of the decrypted string
                 buffer[length - 1] = '\0';      // Remove newline character
                 unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-                options[i] = decrypted;
+                strcpy(options[i], (char *)decrypted);
                 free(decrypted); // Free decrypted buffer
             }
 
@@ -400,7 +399,8 @@ void load_questions(const char *filename,char* options, char* text,int* correct_
             unsigned char correct_index[sizeof(uint8_t)];
             sscanf(buffer, "%s", correct_index);
             xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
-                correct_option = correct_index[0];
+            *correct_option = (int)correct_index[0];
+
         
 
             
@@ -408,15 +408,67 @@ void load_questions(const char *filename,char* options, char* text,int* correct_
                 unsigned char difficulty[sizeof(uint8_t)];
                 sscanf(buffer, "%s", difficulty);
                 xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
-                Idifficulty = difficulty[0];
+                *Idifficulty = (int)difficulty[0];
+
             
 
             
         }
-
-
         fclose(file);
     }
+}
+
+void print_questions(const char *filename, bool print_answers, bool print_difficulty)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file)
+    {
+        perror("Ne moge da se otvori fail za chetene");
+        return;
+    }
+
+    char buffer[256];
+    int index = 1;
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+
+        size_t length = strlen(buffer); // Length of the decrypted string
+        buffer[length - 1] = '\0';      // Remove newline character
+        unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+        printf("Vupros %d: %s\n", index++, decrypted);
+
+        for (int i = 0; i < 4; i++)
+        {
+            fgets(buffer, sizeof(buffer), file);
+            size_t length = strlen(buffer); // Length of the decrypted string
+            buffer[length - 1] = '\0';      // Remove newline character
+            unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+            printf("  Otgovor %d: %s\n", i + 1, decrypted);
+            free(decrypted); // Free decrypted buffer
+        }
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char correct_index[sizeof(uint8_t)];
+        sscanf(buffer, "%s", correct_index);
+        xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
+        if (print_answers)
+        {
+            printf("  Pravilen otgovor: %d\n", correct_index[0]);
+        }
+
+        if (print_difficulty)
+        {
+            fgets(buffer, sizeof(buffer), file);
+            unsigned char difficulty[sizeof(uint8_t)];
+            sscanf(buffer, "%s", difficulty);
+            xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
+            printf("  Trudnost: %d\n", difficulty[0]);
+        }
+
+
+    }
+
+    fclose(file);
 }
 
 void find_question_by_difficulty(uint8_t difficulty, char **text, char ***options, uint8_t *correct_index, bool *has_found) {

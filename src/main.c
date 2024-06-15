@@ -23,7 +23,7 @@ int main()
     const char *options2[] = {"A", "B", "C", "D"};
     add_question_to_file("quiz_questions.txt", "ABCD Vupros", 7, options2, 1);
 
-    // menu();
+    menu();
     
     printf("\nNachalni Vuprosi:\n");
     print_questions("quiz_questions.txt", true, true);
