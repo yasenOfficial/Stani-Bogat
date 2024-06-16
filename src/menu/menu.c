@@ -4,8 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <conio.h>
-#define GETCH() getch()
+
+#ifdef _WIN32
+    #include <conio.h>
+    #define GETCH() getch()
+#else
+    #define GETCH() getchar()
+#endif
 
 #define OPTION_COUNT 5
 #define QUESTION_COUNT 10
@@ -54,19 +59,19 @@ void info_questions(char *question_text, char **options, int *correct_index, int
     printf("Vuvedete nomera na pravilniya otgovor (1-4): ");
     if (scanf("%d", correct_index) != 1 || *correct_index < 1 || *correct_index > 4) {
         printf("Greshka: Nomerut na pravilniya otgovor trqbva da bude mejdu 1 i 4.\n");
-        while (getchar() != '\n'); //  input buffer
+        while (GETCH() != '\n'); //  input buffer
         return;
     }
 
     printf("Vuvedete trudnostta na vuprosa (1-10): ");
     if (scanf("%d", difficulty) != 1 || *difficulty < 1 || *difficulty > 10) {
         printf("Greshka: Trudnostta trqbva da bude mejdu 1 i 10.\n");
-        while (getchar() != '\n'); // input buffer
+        while (GETCH() != '\n'); // input buffer
         return;
     }
 
     //input buffer
-    while (getchar() != '\n');
+    while (GETCH() != '\n');
 }
 
 
@@ -182,7 +187,7 @@ int menu()
                 printf("Igrata zapochna!\n");
                 printf("Natisni kojto i da e klavish za da produljish...\n");
 
-                GETCH(); // Ralchev da pishe kod
+                GETCH(); 
                 // Select random question
                 // press j for menu with jokers
                 int question_count = 10; 
@@ -389,7 +394,7 @@ int menu()
                 scanf("%d", &choice);
 
                 int c;
-                while ((c = getchar()) != '\n' && c != EOF);
+                while ((c = GETCH()) != '\n' && c != EOF);
 
                 char new_question_text[100];
                 int new_difficulty, new_correct_index;

@@ -25,14 +25,13 @@ int main()
 
     menu();
     
-    printf("\nNachalni Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+    // printf("\nNachalni Vuprosi:\n");
+    // print_questions("quiz_questions.txt", true, true);
 
-    // Edit the first question
-    edit_question_in_file("quiz_questions.txt", 1, "How old is Brad Pitt?", 5, newoptions, 1);
+    // edit_question_in_file("quiz_questions.txt", 1, "How old is Brad Pitt?", 5, newoptions, 1);
 
-    printf("\nAktualizirani Vuprosi:\n");
-    print_questions("quiz_questions.txt", true, true);
+    // printf("\nAktualizirani Vuprosi:\n");
+    // print_questions("quiz_questions.txt", true, true);
 
     cleanup_quiz();
 
