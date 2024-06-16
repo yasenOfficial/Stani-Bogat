@@ -193,9 +193,10 @@ int menu()
                 int otg;
                 int correct_answer; // примерен отговор, може да се променя според въпроса
                 char vupros[256]; // примерен въпрос, може да се променя според въпроса
+                bool has_question_been_found = false;
                 
                 while (current_question < question_count) {
-                    load_questions("quiz_questions.txt", option, vupros, &correct_answer, &question_difficulty, 1);
+                    load_questions("quiz_questions.txt", option, vupros, &correct_answer, &question_difficulty, &has_question_been_found, current_question);
                     // printf(" Difficulty: %d, Vupros: %s, Correct answer: %d\n", question_difficulty, vupros, correct_answer);
                     // for(int i = 0; i < 4; i++) printf(" %s\n", option[i]);
 
@@ -343,7 +344,7 @@ int menu()
                                 } while (c != 13 || joker_op != 4);
                             }
                         }
-                    }while (c != 27 && current_question < question_count);
+                    }while (c != 27 && current_question < question_count && has_question_been_found);
                 }
             if (current_question == question_count) {
                     printf("Pozdravleniq, spechelixte igrata!\n");

@@ -39,7 +39,6 @@ extern void add_question_to_file(const char *filename, char *text, uint8_t diffi
 extern void edit_question_in_file(const char *filename, int question_number, const char *newText, uint8_t new_difficulty, const char *newOptions[], uint8_t newCorrect_index);
 extern void save_questions_to_file(const char *filename);
 extern void cleanup_quiz();
-extern void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* Idifficulty, bool* found );
+extern void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* Idifficulty, bool* found, int desired_difficulty);
 extern void print_questions(const char *filename, bool print_answers, bool print_difficulty);
-extern void find_question_by_difficulty(uint8_t difficulty, char **text, char ***options, uint8_t *correct_index, bool *has_found);
 #endif

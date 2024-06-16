@@ -21,7 +21,7 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
 
     if (strcmp(mode, "encryption") == 0)
     {
-        unsigned char *encrypted = (unsigned char *)malloc(length); 
+        unsigned char *encrypted = (unsigned char *)malloc(length);
         if (!encrypted)
         {
             perror("Memory allocation failed");
@@ -31,13 +31,13 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
 
         xor_encrypt_decrypt((const unsigned char *)text, encrypted, length, encryption_key);
         memcpy(result, encrypted, length);
-        result[length] = '\0';             
+        result[length] = '\0';
 
         free(encrypted);
     }
     else if (strcmp(mode, "decryption") == 0)
     {
-        unsigned char *decryption = (unsigned char *)malloc(length); 
+        unsigned char *decryption = (unsigned char *)malloc(length);
         if (!decryption)
         {
             perror("Memory allocation failed");
@@ -46,15 +46,15 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         }
 
         xor_encrypt_decrypt((const unsigned char *)text, decryption, length, encryption_key);
-        memcpy(result, decryption, length); 
-        result[length] = '\0';              
+        memcpy(result, decryption, length);
+        result[length] = '\0';
 
-        free(decryption); 
+        free(decryption);
     }
     else
     {
         printf("Invalid mode\n");
-        free(result); 
+        free(result);
         return NULL;
     }
 
@@ -297,55 +297,45 @@ void save_questions_to_file(const char *filename)
     fclose(file);
 }
 
-void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* difficulty, bool* found)
+void load_questions(const char *filename, char options[4][100], char *text, int *correct_option, int *difficulty, bool *found, int desired_difficulty)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
     {
         perror("Ne moge da se otvori fail za chetene");
-        *found = false;
         return;
     }
-    if(found == true){
-        char buffer[256];
-        while (fgets(buffer, sizeof(buffer), file))
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        size_t length = strlen(buffer); // Length of the decrypted string
+        buffer[length - 1] = '\0';      // Remove newline character
+        unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+        strcpy(text, decrypted);
+
+        for (int i = 0; i < 4; i++)
         {
+            fgets(buffer, sizeof(buffer), file);
             size_t length = strlen(buffer); // Length of the decrypted string
             buffer[length - 1] = '\0';      // Remove newline character
             unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-            strcpy(text, decrypted);
-
-            for (int i = 0; i < 4; i++)
-            {
-                fgets(buffer, sizeof(buffer), file);
-                size_t length = strlen(buffer); // Length of the decrypted string
-                buffer[length - 1] = '\0';      // Remove newline character
-                unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-                strcpy(options[i], (char *)decrypted);
-                free(decrypted); // Free decrypted buffer
-            }
-
-            fgets(buffer, sizeof(buffer), file);
-            unsigned char correct_index[sizeof(uint8_t)];
-            sscanf(buffer, "%s", correct_index);
-            xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
-            *correct_option = (int)correct_index[0];
-
-        
-
-            
-                fgets(buffer, sizeof(buffer), file);
-                unsigned char difficulty[sizeof(uint8_t)];
-                sscanf(buffer, "%s", difficulty);
-                xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
-                *difficulty = (int)difficulty[0];
-
-            
-
-            
+            strcpy(options[i], (char *)decrypted);
+            free(decrypted); // Free decrypted buffer
         }
-        fclose(file);
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char correct_index[sizeof(uint8_t)];
+        sscanf(buffer, "%s", correct_index);
+        xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
+        *correct_option = (int)correct_index[0];
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char difficulty[sizeof(uint8_t)];
+        sscanf(buffer, "%s", difficulty);
+        xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
+        *difficulty = (int)difficulty[0];
     }
+    fclose(file);
 }
 
 void print_questions(const char *filename, bool print_answers, bool print_difficulty)
@@ -394,101 +384,7 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
             xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
             printf("  Trudnost: %d\n", difficulty[0]);
         }
-
-
     }
 
     fclose(file);
-}
-
-void find_question_by_difficulty(uint8_t difficulty, char **text, char ***options, uint8_t *correct_index, bool *has_found) {
-    QuizQuestion *current = head;
-    QuizQuestion *questions_with_difficulty[10]; // Assuming maximum 10 questions per difficulty
-    int count = 0;
-
-    // Find all questions with the given difficulty
-    while (current != NULL) {
-        if (current->difficulty == difficulty) {
-            questions_with_difficulty[count++] = current;
-        }
-        current = current->next;
-    }
-
-    if (count == 0) {
-        *has_found = false;
-        *text = NULL;
-        *options = NULL;
-        *correct_index = 0;
-        return;
-    }
-
-    // Randomly select one question from the found questions
-    int random_index = rand() % count;
-    QuizQuestion *selected_question = questions_with_difficulty[random_index];
-
-    // Set return values
-    *has_found = true;
-
-    // Decrypt and set the question text
-    unsigned char *decrypted_text = debug_encrypt(selected_question->question_text, encryption_key, "decryption");
-    if (decrypted_text == NULL) {
-        *has_found = false;
-        return;
-    }
-    *text = strdup((char *)decrypted_text);
-    free(decrypted_text);
-
-    if (*text == NULL) {
-        *has_found = false;
-        return;
-    }
-
-    // Decrypt and set the correct option index
-    unsigned char decrypted_correct_index[sizeof(uint8_t)];
-    xor_encrypt_decrypt((const unsigned char *)&selected_question->correct_option_index, decrypted_correct_index, sizeof(uint8_t), encryption_key);
-    *correct_index = *(uint8_t *)decrypted_correct_index;
-
-    // Allocate memory for options array
-    *options = (char **)malloc(4 * sizeof(char *));
-    if (*options == NULL) {
-        perror("Memory allocation failed");
-        *has_found = false;
-        free(*text);
-        *text = NULL;
-        *correct_index = 0;
-        return;
-    }
-
-    // Decrypt and copy options
-    for (int i = 0; i < 4; i++) {
-        unsigned char *decrypted_option = debug_encrypt(selected_question->options[i], encryption_key, "decryption");
-        if (decrypted_option == NULL) {
-            perror("Decryption failed");
-            *has_found = false;
-            free(*text);
-            for (int j = 0; j < i; j++) {
-                free((*options)[j]);
-            }
-            free(*options);
-            *text = NULL;
-            *options = NULL;
-            *correct_index = 0;
-            return;
-        }
-        (*options)[i] = strdup((char *)decrypted_option);
-        free(decrypted_option);
-        if ((*options)[i] == NULL) {
-            perror("Memory allocation failed");
-            *has_found = false;
-            free(*text);
-            for (int j = 0; j < i; j++) {
-                free((*options)[j]);
-            }
-            free(*options);
-            *text = NULL;
-            *options = NULL;
-            *correct_index = 0;
-            return;
-        }
-    }
 }
