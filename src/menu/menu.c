@@ -230,6 +230,7 @@ int menu()
                                 {
                                     printf("Pravilen otgovor!\n");
                                     printf("Natisni kojto i da e klavish za da produljish...\n\n");
+                                    current_question++;
                                     GETCH();
                                     break;
                                 }
@@ -249,6 +250,7 @@ int menu()
                                 {
                                     printf("Pravilen otgovor!\n");
                                     printf("Natisni kojto i da e klavish za da produljish...\n\n");
+                                    current_question++;
 
                                     GETCH();
                                     break;
@@ -269,6 +271,7 @@ int menu()
                                 {
                                     printf("Pravilen otgovor!\n");
                                     printf("Natisni kojto i da e klavish za da produljish...\n\n");
+                                    current_question++;
 
                                     GETCH();
                                     break;
@@ -289,6 +292,7 @@ int menu()
                                 {
                                     printf("Pravilen otgovor!\n");
                                     printf("Natisni kojto i da e klavish za da produljish...\n\n");
+                                    current_question++;
 
                                     GETCH();
                                     break;
@@ -350,12 +354,12 @@ int menu()
                                         }
                                         else if (joker_op == 2 && !jokerObadise_used)
                                         {
-                                            jokerObadise(correct_answer, options, question_difficulty); // Примерен верен отговор
+                                            jokerObadise(correct_answer, options, current_question); // Примерен верен отговор
                                             jokerObadise_used = 1;
                                         }
                                         else if (joker_op == 3 && !jokerPublika_used)
                                         {
-                                            jokerPublika(correct_answer, options, question_difficulty); // Примерен верен отговор
+                                            jokerPublika(correct_answer, options, current_question); // Примерен верен отговор
                                             jokerPublika_used = 1;
                                         }
                                         else if (joker_op == 4)
@@ -366,7 +370,6 @@ int menu()
                                 } while (c != 13 || joker_op != 4);
                             }
                         }
-                        current_question++;
                     } while (c != 27 && current_question < question_count && has_question_been_found);
                 }
                 if (current_question == question_count)
@@ -482,15 +485,15 @@ void jokerObadise(int correct, int *options, int difficulty)
     }
 
     int chance = rand() % 100;
-    int friend_answer;
+    char friend_answer;
 
-    int available_options[2];
+    char available_options[2];
     int count = 0;
     for (int i = 0; i < 4; i++)
     {
         if (options[i])
         {
-            available_options[count++] = 1 + i;
+            available_options[count++] = 'A' + i;
         }
     }
 
@@ -506,7 +509,7 @@ void jokerObadise(int correct, int *options, int difficulty)
         } while (friend_answer == correct);
     }
 
-    printf("Prijatelqt vi smqta che verniqt otgovor e: %d\n", friend_answer);
+    printf("Prijatelqt vi smqta che verniqt otgovor e: %c\n", friend_answer);
     GETCH();
 }
 
