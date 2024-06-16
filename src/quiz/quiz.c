@@ -297,7 +297,7 @@ void save_questions_to_file(const char *filename)
     fclose(file);
 }
 
-void load_question(const char *filename,char options[4][100], char* text,int* correct_option, int* difficulty, bool* found)
+void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* difficulty, bool* found)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
