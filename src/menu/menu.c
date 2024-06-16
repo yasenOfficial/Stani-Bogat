@@ -226,6 +226,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
@@ -240,6 +241,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
@@ -254,6 +256,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
@@ -268,6 +271,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
