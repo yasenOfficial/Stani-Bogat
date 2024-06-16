@@ -75,11 +75,6 @@ void info_questions(char *question_text, char **options, int *correct_index, int
 }
 
 
-// Jokeri
-void joker5050(int correct, int *options);
-void jokerObadise(int correct, int *options, int difficulty);
-void jokerPublika(int correct, int *options, int difficulty);
-
 void show_question(int otg, int *options, int joker5050_used, int jokerObadise_used, int jokerPublika_used, char *vupros, char option[4][100])
 {
     system("cls");

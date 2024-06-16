@@ -297,7 +297,7 @@ void save_questions_to_file(const char *filename)
     fclose(file);
 }
 
-void load_questions_from_file(const char *filename)
+/*void load_questions_from_file(const char *filename)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
@@ -366,6 +366,7 @@ void load_questions_from_file(const char *filename)
 
     fclose(file);
 }
+*/
 
 void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* Idifficulty, bool* found )
 {
