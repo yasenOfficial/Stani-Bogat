@@ -21,7 +21,15 @@ int main()
     add_question_to_file("quiz_questions.txt", "How old is Andrew Tate?", 0, options1, 3);
 
     const char *options2[] = {"A", "B", "C", "D"};
-    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 0, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 1, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 2, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 3, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 4, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 5, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 6, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 7, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 8, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 9, options2, 1); // addvame vypros za vsqka trudnost
 
     menu();
     
