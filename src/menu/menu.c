@@ -239,7 +239,6 @@ int menu()
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
-                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
@@ -260,7 +259,6 @@ int menu()
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
-                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
@@ -281,7 +279,6 @@ int menu()
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
-                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
@@ -302,7 +299,6 @@ int menu()
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
-                                    exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
                             }
