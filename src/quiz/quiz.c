@@ -297,78 +297,7 @@ void save_questions_to_file(const char *filename)
     fclose(file);
 }
 
-/*void load_questions_from_file(const char *filename)
-{
-    FILE *file = fopen(filename, "r");
-    if (!file)
-    {
-        perror("Failed to open file for reading");
-        return;
-    }
-
-    cleanup_quiz();
-
-    char buffer[256];
-    while (fgets(buffer, sizeof(buffer), file))
-    {
-        QuizQuestion *new_question = (QuizQuestion *)malloc(sizeof(QuizQuestion));
-        if (!new_question)
-        {
-            perror("Memory allocation failed");
-            fclose(file);
-            return;
-        }
-
-        buffer[strcspn(buffer, "\n")] = '\0';
-        unsigned char *decrypted_text = debug_encrypt(buffer, encryption_key, "decryption");
-        new_question->question_text = strdup((char *)decrypted_text);
-        free(decrypted_text);
-
-        for (int i = 0; i < 4; i++)
-        {
-            if (!fgets(buffer, sizeof(buffer), file)) {
-                perror("Unexpected end of file while reading options");
-                free(new_question);
-                fclose(file);
-                return;
-            }
-            buffer[strcspn(buffer, "\n")] = '\0';
-            unsigned char *decrypted_option = debug_encrypt(buffer, encryption_key, "decryption");
-            new_question->options[i] = strdup((char *)decrypted_option);
-            free(decrypted_option);
-        }
-
-        if (!fgets(buffer, sizeof(buffer), file)) {
-            perror("Unexpected end of file while reading correct option index");
-            free(new_question);
-            fclose(file);
-            return;
-        }
-        buffer[strcspn(buffer, "\n")] = '\0';
-        unsigned char decrypted_correct_index[sizeof(uint8_t)];
-        xor_encrypt_decrypt((const unsigned char *)buffer, decrypted_correct_index, sizeof(uint8_t), encryption_key);
-        new_question->correct_option_index = *(uint8_t *)decrypted_correct_index;
-
-        if (!fgets(buffer, sizeof(buffer), file)) {
-            perror("Unexpected end of file while reading difficulty");
-            free(new_question);
-            fclose(file);
-            return;
-        }
-        buffer[strcspn(buffer, "\n")] = '\0';
-        unsigned char decrypted_difficulty[sizeof(uint8_t)];
-        xor_encrypt_decrypt((const unsigned char *)buffer, decrypted_difficulty, sizeof(uint8_t), encryption_key);
-        new_question->difficulty = *(uint8_t *)decrypted_difficulty;
-
-        new_question->next = head;
-        head = new_question;
-    }
-
-    fclose(file);
-}
-*/
-
-void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* Idifficulty, bool* found )
+void load_question(const char *filename,char options[4][100], char* text,int* correct_option, int* difficulty, bool* found)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
@@ -409,7 +338,7 @@ void load_questions(const char *filename,char options[4][100], char* text,int* c
                 unsigned char difficulty[sizeof(uint8_t)];
                 sscanf(buffer, "%s", difficulty);
                 xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
-                *Idifficulty = (int)difficulty[0];
+                *difficulty = (int)difficulty[0];
 
             
 

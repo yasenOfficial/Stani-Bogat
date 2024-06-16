@@ -186,14 +186,14 @@ int menu()
                 // Select random question
                 // press j for menu with jokers
                 int question_count = 10; 
-                int current_question = 0;
+                int current_question = 0; // same as below
                 int question_difficulty = 0;   // примерна трудност, може да се променя според въпроса
                 int options[4] = {1, 1, 1, 1}; // всички отговори са налични
                 char option[4][100];
                 int otg;
                 int correct_answer; // примерен отговор, може да се променя според въпроса
                 char vupros[256]; // примерен въпрос, може да се променя според въпроса
-
+                
                 while (current_question < question_count) {
                     load_questions("quiz_questions.txt", option, vupros, &correct_answer, &question_difficulty, 1);
                     // printf(" Difficulty: %d, Vupros: %s, Correct answer: %d\n", question_difficulty, vupros, correct_answer);
@@ -201,7 +201,7 @@ int menu()
 
                     do
                     {
-                        show_question(otg, options, joker5050_used, jokerObadise_used, jokerPublika_used, vupros, option);
+                        show_question(otg, options, joker5050_used, jokerObadise_used, jokerPublika_used, vupros, option); // izkarva menu na bazata na kakwoto si mu dal
                         
 
                         c = GETCH();
@@ -226,6 +226,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    cleanup_quiz();
                                     exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
@@ -241,6 +242,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    cleanup_quiz();
                                     exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
@@ -256,6 +258,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    cleanup_quiz();
                                     exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
@@ -271,6 +274,7 @@ int menu()
                                 else{
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
+                                    cleanup_quiz();
                                     exit("Greshen otgovor!\n");
                                 }
                                 GETCH();
