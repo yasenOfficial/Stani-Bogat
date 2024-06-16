@@ -6,10 +6,10 @@
 #include <time.h>
 
 #ifdef _WIN32
-    #include <conio.h>
-    #define GETCH() getch()
+#include <conio.h>
+#define GETCH() getch()
 #else
-    #define GETCH() getchar()
+#define GETCH() getchar()
 #endif
 
 #define OPTION_COUNT 5
@@ -35,45 +35,53 @@ void option_menu(unsigned char c, int *otg, int count)
     }
 }
 
-void info_questions(char *question_text, char **options, int *correct_index, int *difficulty) {
+void info_questions(char *question_text, char **options, int *correct_index, int *difficulty)
+{
 
     printf("Vuvedete tekst na vuprosa: ");
-    if (fgets(question_text, 256, stdin) == NULL || is_empty_string(question_text)) {
+    if (fgets(question_text, 256, stdin) == NULL || is_empty_string(question_text))
+    {
         printf("Greshka: Tekstut na vuprosa ne moje da bude prazen.\n");
         return;
     }
-    question_text[strcspn(question_text, "\n")] = '\0'; //Maha noviq red
+    question_text[strcspn(question_text, "\n")] = '\0'; // Maha noviq red
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         char option[256];
         printf("Vuvedete otgovor %d: ", i + 1);
-        if (fgets(option, sizeof(option), stdin) == NULL || is_empty_string(option)) {
+        if (fgets(option, sizeof(option), stdin) == NULL || is_empty_string(option))
+        {
             printf("Greshka: Otgovor %d ne moje da bude prazen.\n", i + 1);
             i--; // Retry the same option
             continue;
         }
         option[strcspn(option, "\n")] = '\0'; // Maha noviq red
-        options[i] = strdup(option); // dublikira stringa v options
+        options[i] = strdup(option);          // dublikira stringa v options
     }
 
     printf("Vuvedete nomera na pravilniya otgovor (1-4): ");
-    if (scanf("%d", correct_index) != 1 || *correct_index < 1 || *correct_index > 4) {
+    if (scanf("%d", correct_index) != 1 || *correct_index < 1 || *correct_index > 4)
+    {
         printf("Greshka: Nomerut na pravilniya otgovor trqbva da bude mejdu 1 i 4.\n");
-        while (GETCH() != '\n'); //  input buffer
+        while (GETCH() != '\n')
+            ; //  input buffer
         return;
     }
 
     printf("Vuvedete trudnostta na vuprosa (1-10): ");
-    if (scanf("%d", difficulty) != 1 || *difficulty < 1 || *difficulty > 10) {
+    if (scanf("%d", difficulty) != 1 || *difficulty < 1 || *difficulty > 10)
+    {
         printf("Greshka: Trudnostta trqbva da bude mejdu 1 i 10.\n");
-        while (GETCH() != '\n'); // input buffer
+        while (GETCH() != '\n')
+            ; // input buffer
         return;
     }
 
-    //input buffer
-    while (GETCH() != '\n');
+    // input buffer
+    while (GETCH() != '\n')
+        ;
 }
-
 
 void show_question(int otg, int *options, int joker5050_used, int jokerObadise_used, int jokerPublika_used, char *vupros, char option[4][100])
 {
@@ -122,7 +130,6 @@ void show_question(int otg, int *options, int joker5050_used, int jokerObadise_u
         printf("Publika ");
     printf("\n");
 }
-
 
 int is_empty_string(const char *str)
 {
@@ -182,20 +189,21 @@ int menu()
                 printf("Igrata zapochna!\n");
                 printf("Natisni kojto i da e klavish za da produljish...\n");
 
-                GETCH(); 
+                GETCH();
                 // Select random question
                 // press j for menu with jokers
-                int question_count = 10; 
-                int current_question = 0; // same as below
+                int question_count = 10;
+                int current_question = 0;      // same as below
                 int question_difficulty = 0;   // примерна трудност, може да се променя според въпроса
                 int options[4] = {1, 1, 1, 1}; // всички отговори са налични
                 char option[4][100];
                 int otg;
                 int correct_answer; // примерен отговор, може да се променя според въпроса
-                char vupros[256]; // примерен въпрос, може да се променя според въпроса
+                char vupros[256];   // примерен въпрос, може да се променя според въпроса
                 bool has_question_been_found = false;
-                
-                while (current_question < question_count) {
+
+                while (current_question < question_count)
+                {
                     load_questions("quiz_questions.txt", option, vupros, &correct_answer, &question_difficulty, &has_question_been_found, current_question);
                     // printf(" Difficulty: %d, Vupros: %s, Correct answer: %d\n", question_difficulty, vupros, correct_answer);
                     // for(int i = 0; i < 4; i++) printf(" %s\n", option[i]);
@@ -203,7 +211,6 @@ int menu()
                     do
                     {
                         show_question(otg, options, joker5050_used, jokerObadise_used, jokerPublika_used, vupros, option); // izkarva menu na bazata na kakwoto si mu dal
-                        
 
                         c = GETCH();
                         option_menu(c, &otg, OPTION_COUNT);
@@ -219,12 +226,15 @@ int menu()
                             if (otg == 1 && options[0])
                             {
                                 printf("Izbra otgovor A\n");
-                                if (correct_answer == 1){
+                                if (correct_answer == 1)
+                                {
                                     printf("Pravilen otgovor!\n");
+                                    printf("Natisni kojto i da e klavish za da produljish...\n\n");
                                     GETCH();
                                     break;
                                 }
-                                else{
+                                else
+                                {
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
@@ -235,12 +245,16 @@ int menu()
                             else if (otg == 2 && options[1])
                             {
                                 printf("Izbra otgovor B\n");
-                                if (correct_answer == 2){
+                                if (correct_answer == 2)
+                                {
                                     printf("Pravilen otgovor!\n");
+                                    printf("Natisni kojto i da e klavish za da produljish...\n\n");
+
                                     GETCH();
                                     break;
                                 }
-                                else{
+                                else
+                                {
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
@@ -251,12 +265,16 @@ int menu()
                             else if (otg == 3 && options[2])
                             {
                                 printf("Izbra otgovor C\n");
-                                if (correct_answer == 3){
+                                if (correct_answer == 3)
+                                {
                                     printf("Pravilen otgovor!\n");
+                                    printf("Natisni kojto i da e klavish za da produljish...\n\n");
+
                                     GETCH();
                                     break;
                                 }
-                                else{
+                                else
+                                {
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
@@ -267,12 +285,16 @@ int menu()
                             else if (otg == 4 && options[3])
                             {
                                 printf("Izbra otgovor D\n");
-                                if (correct_answer == 4){
+                                if (correct_answer == 4)
+                                {
                                     printf("Pravilen otgovor!\n");
+                                    printf("Natisni kojto i da e klavish za da produljish...\n\n");
+
                                     GETCH();
                                     break;
                                 }
-                                else{
+                                else
+                                {
                                     printf("Greshen otgovor!\n");
                                     current_question = question_count;
                                     cleanup_quiz();
@@ -344,11 +366,15 @@ int menu()
                                 } while (c != 13 || joker_op != 4);
                             }
                         }
-                    }while (c != 27 && current_question < question_count && has_question_been_found);
+                        current_question++;
+                    } while (c != 27 && current_question < question_count && has_question_been_found);
                 }
-            if (current_question == question_count) {
+                if (current_question == question_count)
+                {
                     printf("Pozdravleniq, spechelixte igrata!\n");
-                } else {
+                }
+                else
+                {
                     printf("Kray na igrata.\n");
                 }
             }
@@ -380,7 +406,7 @@ int menu()
                 info_questions(question_text, options, &correct_index, &difficulty);
 
                 printf("sa sega ok:");
-     
+
                 add_question_to_file("quiz_questions.txt", question_text, difficulty, options, correct_index);
                 printf("Vuprosut e dobaven uspeshno.\n");
 
@@ -394,7 +420,8 @@ int menu()
                 scanf("%d", &choice);
 
                 int c;
-                while ((c = GETCH()) != '\n' && c != EOF);
+                while ((c = GETCH()) != '\n' && c != EOF)
+                    ;
 
                 char new_question_text[100];
                 int new_difficulty, new_correct_index;

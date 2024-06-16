@@ -305,22 +305,26 @@ void load_questions(const char *filename, char options[4][100], char *text, int 
         perror("Ne moge da se otvori fail za chetene");
         return;
     }
+
     char buffer[256];
+    int questions_with_desired_difficulty = 0;
+
+    // Count questions with the desired difficulty
     while (fgets(buffer, sizeof(buffer), file))
     {
-        size_t length = strlen(buffer); // Length of the decrypted string
-        buffer[length - 1] = '\0';      // Remove newline character
+        size_t length = strlen(buffer);
+        buffer[length - 1] = '\0';
         unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
         strcpy(text, decrypted);
 
         for (int i = 0; i < 4; i++)
         {
             fgets(buffer, sizeof(buffer), file);
-            size_t length = strlen(buffer); // Length of the decrypted string
-            buffer[length - 1] = '\0';      // Remove newline character
-            unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
-            strcpy(options[i], (char *)decrypted);
-            free(decrypted); // Free decrypted buffer
+            size_t length = strlen(buffer);
+            buffer[length - 1] = '\0';
+            unsigned char *decrypted_option = debug_encrypt(buffer, encryption_key, "decryption");
+            strcpy(options[i], (char *)decrypted_option);
+            free(decrypted_option);
         }
 
         fgets(buffer, sizeof(buffer), file);
@@ -330,11 +334,74 @@ void load_questions(const char *filename, char options[4][100], char *text, int 
         *correct_option = (int)correct_index[0];
 
         fgets(buffer, sizeof(buffer), file);
-        unsigned char difficulty[sizeof(uint8_t)];
-        sscanf(buffer, "%s", difficulty);
-        xor_encrypt_decrypt(difficulty, (unsigned char *)&difficulty, sizeof(uint8_t), encryption_key);
-        *difficulty = (int)difficulty[0];
+        unsigned char diff[sizeof(uint8_t)];
+        sscanf(buffer, "%s", diff);
+        xor_encrypt_decrypt(diff, (unsigned char *)&diff, sizeof(uint8_t), encryption_key);
+        *difficulty = (int)diff[0];
+
+        if (*difficulty == desired_difficulty)
+        {
+            questions_with_desired_difficulty++;
+        }
     }
+
+    // Check if there are questions with desired difficulty
+    if (questions_with_desired_difficulty == 0)
+    {
+        fclose(file);
+        *found = false;
+        return;
+    }
+
+    // Generate a random number to select a question
+    srand(time(NULL));
+    int random_question = rand() % questions_with_desired_difficulty;
+
+    // Reset file pointer to the beginning of the file
+    fseek(file, 0, SEEK_SET);
+
+    // Read questions again and find the randomly selected one
+    int count = 0;
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        size_t length = strlen(buffer);
+        buffer[length - 1] = '\0';
+        unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+        strcpy(text, decrypted);
+
+        for (int i = 0; i < 4; i++)
+        {
+            fgets(buffer, sizeof(buffer), file);
+            size_t length = strlen(buffer);
+            buffer[length - 1] = '\0';
+            unsigned char *decrypted_option = debug_encrypt(buffer, encryption_key, "decryption");
+            strcpy(options[i], (char *)decrypted_option);
+            free(decrypted_option);
+        }
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char correct_index[sizeof(uint8_t)];
+        sscanf(buffer, "%s", correct_index);
+        xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
+        *correct_option = (int)correct_index[0];
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char diff[sizeof(uint8_t)];
+        sscanf(buffer, "%s", diff);
+        xor_encrypt_decrypt(diff, (unsigned char *)&diff, sizeof(uint8_t), encryption_key);
+        *difficulty = (int)diff[0];
+
+        if (*difficulty == desired_difficulty && count == random_question)
+        {
+            *found = true;
+            break;
+        }
+        else if (*difficulty == desired_difficulty)
+        {
+            count++;
+        }
+    }
+
     fclose(file);
 }
 

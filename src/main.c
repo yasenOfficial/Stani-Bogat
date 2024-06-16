@@ -18,10 +18,10 @@ int main()
     const char *newoptions[] = {"1", "2", "3", "4"};
 
     const char *options1[] = {"35", "36", "37", "38"};
-    add_question_to_file("quiz_questions.txt", "How old is Andrew Tate?", 5, options1, 3);
+    add_question_to_file("quiz_questions.txt", "How old is Andrew Tate?", 0, options1, 3);
 
     const char *options2[] = {"A", "B", "C", "D"};
-    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 7, options2, 1);
+    add_question_to_file("quiz_questions.txt", "ABCD Vupros", 0, options2, 1);
 
     menu();
     
