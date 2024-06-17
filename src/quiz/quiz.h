@@ -41,4 +41,6 @@ extern void save_questions_to_file(const char *filename);
 extern void cleanup_quiz();
 extern void load_questions(const char *filename,char options[4][100], char* text,int* correct_option, int* Idifficulty, bool* found, int desired_difficulty);
 extern void print_questions(const char *filename, bool print_answers, bool print_difficulty);
+extern void load_random_question(const char *filename, char options[4][100], char *text, int *correct_option, int *difficulty);
+
 #endif

@@ -455,3 +455,98 @@ void print_questions(const char *filename, bool print_answers, bool print_diffic
 
     fclose(file);
 }
+
+void load_random_question(const char *filename, char options[4][100], char *text, int *correct_option, int *difficulty)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file)
+    {
+        perror("Ne moge da se otvori fail za chetene");
+        return;
+    }
+
+    char buffer[256];
+    int count = 0;
+
+    // Count questions with the desired difficulty
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        size_t length = strlen(buffer);
+        buffer[length - 1] = '\0';
+        unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+        strcpy(text, decrypted);
+
+        for (int i = 0; i < 4; i++)
+        {
+            fgets(buffer, sizeof(buffer), file);
+            size_t length = strlen(buffer);
+            buffer[length - 1] = '\0';
+            unsigned char *decrypted_option = debug_encrypt(buffer, encryption_key, "decryption");
+            strcpy(options[i], (char *)decrypted_option);
+            free(decrypted_option);
+        }
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char correct_index[sizeof(uint8_t)];
+        sscanf(buffer, "%s", correct_index);
+        xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
+        *correct_option = (int)correct_index[0];
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char diff[sizeof(uint8_t)];
+        sscanf(buffer, "%s", diff);
+        xor_encrypt_decrypt(diff, (unsigned char *)&diff, sizeof(uint8_t), encryption_key);
+        *difficulty = (int)diff[0];
+
+        count++;
+    }
+
+    srand(time(NULL));
+    int random_question = rand() % count;
+
+    // Reset file pointer to the beginning of the file
+    fseek(file, 0, SEEK_SET);
+
+    // Read questions again and find the randomly selected one
+    count = 0;
+    while (fgets(buffer, sizeof(buffer), file))
+    {
+        size_t length = strlen(buffer);
+        buffer[length - 1] = '\0';
+        unsigned char *decrypted = debug_encrypt(buffer, encryption_key, "decryption");
+        strcpy(text, decrypted);
+
+        for (int i = 0; i < 4; i++)
+        {
+            fgets(buffer, sizeof(buffer), file);
+            size_t length = strlen(buffer);
+            buffer[length - 1] = '\0';
+            unsigned char *decrypted_option = debug_encrypt(buffer, encryption_key, "decryption");
+            strcpy(options[i], (char *)decrypted_option);
+            free(decrypted_option);
+        }
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char correct_index[sizeof(uint8_t)];
+        sscanf(buffer, "%s", correct_index);
+        xor_encrypt_decrypt(correct_index, (unsigned char *)&correct_index, sizeof(uint8_t), encryption_key);
+        *correct_option = (int)correct_index[0];
+
+        fgets(buffer, sizeof(buffer), file);
+        unsigned char diff[sizeof(uint8_t)];
+        sscanf(buffer, "%s", diff);
+        xor_encrypt_decrypt(diff, (unsigned char *)&diff, sizeof(uint8_t), encryption_key);
+        *difficulty = (int)diff[0];
+
+        if (count == random_question)
+        {
+            break;
+        }
+        else
+        {
+            count++;
+        }
+    }
+
+    fclose(file);
+}
