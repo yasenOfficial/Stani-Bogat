@@ -14,3 +14,10 @@ A project for 10th grade Proizvodstvena Praktika
 ```make clean```
 
 
+### How we distributed the work:
+
+Yasen - Encryption / Decryption + a little in quiz logic
+
+Cveto - menu
+
+Ralchev - quiz logiv

@@ -19,6 +19,10 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         return NULL;
     }
 
+    // Debug print: Input text and length
+    // printf("Input text: %s\n", text);
+    // printf("Text length: %zu\n", length);
+
     if (strcmp(mode, "encryption") == 0)
     {
         unsigned char *encrypted = (unsigned char *)malloc(length);
@@ -30,6 +34,15 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         }
 
         xor_encrypt_decrypt((const unsigned char *)text, encrypted, length, encryption_key);
+
+        // Debug print: Encrypted data in hex
+        // printf("Encrypted data (hex): ");
+        // for (size_t i = 0; i < length; ++i)
+        // {
+        //     printf("%02X ", encrypted[i]);
+        // }
+        // printf("\n");
+
         memcpy(result, encrypted, length);
         result[length] = '\0';
 
@@ -46,6 +59,16 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         }
 
         xor_encrypt_decrypt((const unsigned char *)text, decryption, length, encryption_key);
+
+
+        // Debug print: Decrypted data in hex
+        // printf("Decrypted data (hex): ");
+        // for (size_t i = 0; i < length; ++i)
+        // {
+        //     printf("%02X ", decrypted[i]);
+        // }
+        // printf("\n");
+
         memcpy(result, decryption, length);
         result[length] = '\0';
 
@@ -57,6 +80,14 @@ unsigned char *debug_encrypt(const char *text, const unsigned char *encryption_k
         free(result);
         return NULL;
     }
+
+    // Debug print: Final result in hex
+    // printf("Final result (hex): ");
+    // for (size_t i = 0; i < length; ++i)
+    // {
+    //     printf("%02X ", result[i]);
+    // }
+    // printf("\n");
 
     return result;
 }
