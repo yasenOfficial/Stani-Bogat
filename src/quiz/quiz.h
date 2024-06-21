@@ -20,19 +20,7 @@ typedef struct quiz_question {
     struct quiz_question *next;
 } QuizQuestion;
 
-/*
-Имаше няколко опции за реализация на тази задача.
-Linked list
-BST
-Graph
 
-Избрахме linked list, защото е най-лесно да се добавят нови въпроси и да се търси въпрос по трудност. 
-BST и Graph също биха били добри опции, но не биха донесли значително подобрение на функционалността на програмата (overkill са), 
-тъй като не се изисква сложно търсене на въпроси.
-
-Ще използваме масив от linked lists, като всеки индекс на масива съответства на определено ниво на трудност, 
-което съдържа свързан списък с въпроси за това ниво. Тази структура помага за ефективна категоризация и извличане.
-*/
 
 extern void initialize_quiz();
 extern void add_question_to_file(const char *filename, char *text, uint8_t difficulty, char **options, uint8_t correct_index);

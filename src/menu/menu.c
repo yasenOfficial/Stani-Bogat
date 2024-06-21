@@ -149,7 +149,7 @@ int menu()
         system("cls");
 
         printf("***************************\n");
-        printf("*     STANI BOGAT         *\n");
+        printf("*       STANI BOGAT       *\n");
         printf("***************************\n");
 
         if (op == 1)
